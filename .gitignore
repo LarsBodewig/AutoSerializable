@@ -4,6 +4,11 @@
 # maven
 **/target/
 
+# eclipse
+**/.classpath
+**/.project
+**/.settings
+
 # from lombok
 /testenvironment.properties
 /bin

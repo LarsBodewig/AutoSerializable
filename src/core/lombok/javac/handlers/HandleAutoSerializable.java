@@ -24,18 +24,23 @@ package lombok.javac.handlers;
 import static lombok.javac.handlers.HandleDelegate.HANDLE_DELEGATE_PRIORITY;
 
 import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.sun.tools.javac.tree.JCTree.JCAnnotation;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
 import com.sun.tools.javac.util.List;
+import com.sun.tools.javac.util.ListBuffer;
 
-import lombok.core.AST.Kind;
 import lombok.AccessLevel;
+import lombok.core.AST.Kind;
 import lombok.core.HandlerPriority;
+import lombok.javac.JavacAST;
 import lombok.javac.JavacASTAdapter;
 import lombok.javac.JavacASTVisitor;
 import lombok.javac.JavacNode;
+import lombok.javac.JavacTreeMaker;
 import lombok.javac.ResolutionResetNeeded;
 import lombok.javac.handlers.HandleConstructor.SkipIfConstructorExists;
 import lombok.spi.Provides;
@@ -45,9 +50,19 @@ import lombok.spi.Provides;
 @ResolutionResetNeeded
 public class HandleAutoSerializable extends JavacASTAdapter {
 
+	private static final Logger logger = Logger.getLogger("AutoSerializable");
+	
+	private static JCExpression serializableExp(JavacAST ast) {
+		JavacTreeMaker maker = ast.getTreeMaker();
+		JCExpression out = maker.Ident(ast.toName("java"));
+		out = maker.Select(out, ast.toName("io"));
+		out = maker.Select(out, ast.toName("Serializable"));
+		return out;
+	}
+
 	private HandleConstructor handleConstructor = new HandleConstructor();
 
-	@Override public void visitType(JavacNode typeNode, JCClassDecl type) {
+	@Override public void endVisitType(JavacNode typeNode, JCClassDecl type) {
 		if (typeNode.getKind() == Kind.TYPE) {
 			// check if the class already implements serializable (directly)
 			boolean implementsSerializable = false;
@@ -57,9 +72,11 @@ public class HandleAutoSerializable extends JavacASTAdapter {
 			}
 			if (!implementsSerializable) {
 				// implement serializable
-				JCExpression serializable = 
-					JavacHandlerUtil.genTypeRef(typeNode, Serializable.class.getCanonicalName());
-				type.getImplementsClause().add(serializable);
+				ListBuffer<JCExpression> implementing = new ListBuffer<JCExpression>();
+				implementing.addAll(type.implementing);
+				implementing.add(serializableExp(typeNode.getAst()));
+				type.implementing = implementing.toList();
+
 				// add protected no-arg constructor if necessary
 				handleConstructor.generateConstructor(
 					typeNode, 
@@ -70,6 +87,9 @@ public class HandleAutoSerializable extends JavacASTAdapter {
 					null, 
 					SkipIfConstructorExists.NO, 
 					typeNode);
+				logger.log(Level.WARNING, "Added Serializable to " + type.getSimpleName().toString());
+			} else {
+				logger.log(Level.WARNING, type.getSimpleName().toString() + " already implements Serializable");
 			}
 		}
 	}
