@@ -24,6 +24,11 @@ import lombok.javac.ResolutionResetNeeded;
 import lombok.javac.handlers.HandleConstructor.SkipIfConstructorExists;
 import lombok.spi.Provides;
 
+/**
+ * Provides an JavacASTAdapter to manipulate all source files. Adds
+ * {@code implements Serializable} to the type declaration and a no-arg
+ * constructor if necessary.
+ */
 @Provides(JavacASTVisitor.class)
 @HandlerPriority(HANDLE_DELEGATE_PRIORITY + 200)
 @ResolutionResetNeeded
@@ -41,6 +46,17 @@ public class HandleAutoSerializable extends JavacASTAdapter {
 
 	private HandleConstructor handleConstructor = new HandleConstructor();
 
+	/**
+	 * Called when a type was read. Adds {@code implements Serializable} to the
+	 * type declaration and a no-arg constructor unless the type already
+	 * explicitly declares implementing {@code Serializable}. The no-arg
+	 * constructor is created based on Lombok's default behaviour.
+	 * 
+	 * @param typeNode
+	 *            the AST node
+	 * @param type
+	 *            the type delcaration
+	 */
 	@Override public void endVisitType(JavacNode typeNode, JCClassDecl type) {
 		if (typeNode.getKind() == Kind.TYPE) {
 			// check if the class already implements serializable (directly)

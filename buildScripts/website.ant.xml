@@ -185,10 +185,12 @@ such as applying the templates to produce the website, converting the changelog 
 		<mkdir dir="build/api" />
 		<property name="javadoc.overview.html" location="build/javadoc.overview.html" />
 		<echo file="${javadoc.overview.html}"><![CDATA[<html><body>
-			Welcome to the lombok javadoc.&nbsp;If you're just looking to learn more about using lombok
-			You probably want to look at <a href="https://projectlombok.org/features/all">the feature documentation</a>.&nbsp;Otherwise,
+			<p>AutoSerializable is an extension of lombok.&nbsp;Read more on the
+			<a href="http://github.com/LarsBodewig/AutoSerializable">GitHub project page</a>.</p>
+			<p>If you want to learn more about using lombok you probably want to look at
+			<a href="https://projectlombok.org/features/all">the feature documentation</a>.&nbsp;Otherwise,
 			check the <a href="lombok/package-summary.html">lombok</a> package.&nbsp;If you're trying to extend lombok or
-			write your own plugins, the other packages are what you're looking for.</body></html>
+			write your own plugins, the other packages are what you're looking for.</p></body></html>
 		]]></echo>
 		<tstamp>
 			<format property="javadoc.year" pattern="yyyy" />
@@ -199,8 +201,8 @@ such as applying the templates to produce the website, converting the changelog 
 			<package name="lombok.extern.*" />
 			<classpath location="build/lombok-main" />
 			<classpath location="build/lombok-utils" />
-			<header><![CDATA[<a href='https://projectlombok.org/' target='_blank'>Lombok</a> - ]]>v${lombok.version}</header>
-			<bottom><![CDATA[<i>Copyright &copy; 2009-${javadoc.year} The Project Lombok Authors, licensed under the <a href='http://www.opensource.org/licenses/mit-license.php' target='_blank'>MIT licence</a>.</i>]]></bottom>
+			<header>AutoSerializablev${lombok.version}</header>
+			<bottom><![CDATA[<i>Copyright &copy; 2009-${javadoc.year} The Project Lombok Authors and 2024-${javadoc.year} Lars Bodewig, licensed under the <a href='http://www.opensource.org/licenses/mit-license.php' target='_blank'>MIT licence</a>.</i>]]></bottom>
 		</javadoc>
 		<!-- bugfix for boneheaded javadoc bug where ?is-external=true is inserted before an anchor ref, breaking the anchor ref.
 		is-external=true doesn't actually do anything except mess with titles, so, we'll just get rid of it. -->

@@ -24,6 +24,11 @@ import lombok.eclipse.EclipseNode;
 import lombok.eclipse.handlers.HandleConstructor.SkipIfConstructorExists;
 import lombok.spi.Provides;
 
+/**
+ * Provides an EclipseASTAdapter to manipulate all source files. Adds
+ * {@code implements Serializable} to the type declaration and a no-arg
+ * constructor if necessary.
+ */
 @Provides(EclipseASTAdapter.class)
 @DeferUntilPostDiet
 @HandlerPriority(65537)
@@ -37,7 +42,18 @@ public class HandleAutoSerializable extends EclipseASTAdapter {
 	}
 
 	private HandleConstructor handleConstructor = new HandleConstructor();
-
+	
+	/**
+	 * Called when a type was read. Adds {@code implements Serializable} to the
+	 * type declaration and a no-arg constructor unless the type already
+	 * explicitly declares implementing {@code Serializable}. The no-arg
+	 * constructor is created based on Lombok's default behaviour.
+	 * 
+	 * @param typeNode
+	 *            the AST node
+	 * @param type
+	 *            the type delcaration
+	 */
 	@Override public void endVisitType(EclipseNode typeNode, TypeDeclaration type) {
 		if (typeNode.getKind() == Kind.TYPE) {
 			// check if the class already implements serializable (directly)
