@@ -51,26 +51,42 @@
 	</properties>
 
 	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-install-plugin</artifactId>
-					<version>3.1.1</version>
-					<configuration>
-						<skip>true</skip>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-deploy-plugin</artifactId>
-					<version>3.1.1</version>
-					<configuration>
-						<skip>true</skip>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>3.1.1</version>
+				<executions>
+					<execution>
+						<id>default-install</id>
+						<configuration>
+							<skip>true</skip>
+						</configuration>
+					</execution>
+					<execution>
+						<id>local-install</id>
+						<phase>install</phase>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<configuration>
+							<file>../dist/lombok-${project.version}.jar</file>
+							<pomFile>./pom.xml</pomFile>
+							<sources>../dist/lombok-${project.version}-sources.jar</sources>
+							<javadoc>../dist/lombok-${project.version}-javadoc.jar</javadoc>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>3.1.1</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
 
 	<profiles>
@@ -96,10 +112,10 @@
 								</goals>
 								<phase>deploy</phase>
 								<configuration>
-									<file>dist/lombok-${project.version}.jar</file>
-									<pomFile>build/pom.xml</pomFile>
-									<sources>dist/lombok-${project.version}-sources.jar</sources>
-									<javadoc>dist/lombok-${project.version}-javadoc.jar</javadoc>
+									<file>../dist/lombok-${project.version}.jar</file>
+									<pomFile>./pom.xml</pomFile>
+									<sources>../dist/lombok-${project.version}-sources.jar</sources>
+									<javadoc>../dist/lombok-${project.version}-javadoc.jar</javadoc>
 									<repositoryId>${project.distributionManagement.repository.id}</repositoryId>
 									<url>${project.distributionManagement.repository.url}</url>
 								</configuration>
