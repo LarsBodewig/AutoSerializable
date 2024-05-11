@@ -5,5 +5,5 @@ See the [Lombok Changelog](https://github.com/projectlombok/lombok) for their ch
 AutoSerializable
 ----------------
 
-### v1.18.32 (April 2024)
+### v1.18.32-1 (April 2024)
 * Initial version

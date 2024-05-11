@@ -82,6 +82,7 @@ public abstract class Symbol implements Element {
 		@Override public NestingKind getNestingKind() { return null; }
 		@Override public <R, P> R accept(ElementVisitor<R, P> v, P p) { return null; }
 		@Override public java.util.List<? extends TypeParameterElement> getTypeParameters() { return null; }
+		public boolean isAnnotationType() { return false; } // should be inherited but does not compile correctly
 	}
 	
 	// JDK9

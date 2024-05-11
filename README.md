@@ -10,8 +10,10 @@ You can apply AutoSerializable the same way you [setup Lombok](https://projectlo
 ```xml
 <groupId>dev.bodewig.autoserializable</groupId>
 <artifactId>autoserializable</artifactId>
-<version>1.18.32</version>
+<version>1.18.32-1</version>
 ```
+
+Build and test: `ant maven && cd it && mvn clean test && cd ..`
 
 ---
 

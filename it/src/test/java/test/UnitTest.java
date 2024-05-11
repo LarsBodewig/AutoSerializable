@@ -17,6 +17,13 @@ public class UnitTest {
 	@Test
 	public void instance() {
 		assertInstanceOf(Serializable.class, new TestBean(0));
+
+		assertInstanceOf(Serializable.class, new BeanWithNoArgsConstructor.Explicit());
+		assertInstanceOf(Serializable.class, new BeanWithNoArgsConstructor.Implicit());
+		assertInstanceOf(Serializable.class, new BeanWithNoArgsConstructor.Inherited());
+
+		assertInstanceOf(Serializable.class, new BeanWithNullAnnotation());
+		assertInstanceOf(Serializable.class, new BeanWithNullAnnotation.AnnotedType());
 	}
 
 	@Test

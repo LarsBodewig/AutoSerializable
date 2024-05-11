@@ -14,7 +14,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>edge-SNAPSHOT</version>
+			<version>local-jar</version>
 			<scope>system</scope>
 			<systemPath>${project.basedir}/../dist/lombok.jar</systemPath>
 		</dependency>

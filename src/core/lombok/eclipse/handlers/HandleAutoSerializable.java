@@ -55,7 +55,7 @@ public class HandleAutoSerializable extends EclipseASTAdapter {
 	 *            the type delcaration
 	 */
 	@Override public void endVisitType(EclipseNode typeNode, TypeDeclaration type) {
-		if (typeNode.getKind() == Kind.TYPE) {
+		if (typeNode.getKind() == Kind.TYPE  && type.kind(type.modifiers) != TypeDeclaration.ANNOTATION_TYPE_DECL) {
 			// check if the class already implements serializable (directly)
 			boolean implementsSerializable = false;
 			for (TypeReference interf : type.superInterfaces) {
@@ -71,12 +71,12 @@ public class HandleAutoSerializable extends EclipseASTAdapter {
 
 				// add protected no-arg constructor if necessary
 				handleConstructor.generateConstructor(
-					typeNode, 
-					AccessLevel.PROTECTED, 
-					List.<EclipseNode>nil(), 
-					true, 
-					null, 
-					SkipIfConstructorExists.NO, 
+					typeNode,
+					AccessLevel.PROTECTED,
+					List.<EclipseNode>nil(),
+					true,
+					null,
+					SkipIfConstructorExists.YES,
 					List.<Annotation>nil(),
 					typeNode);
 				logger.log(Level.WARNING, "Added Serializable to " + String.valueOf(type.name));

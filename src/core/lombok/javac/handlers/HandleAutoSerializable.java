@@ -58,7 +58,7 @@ public class HandleAutoSerializable extends JavacASTAdapter {
 	 *            the type delcaration
 	 */
 	@Override public void endVisitType(JavacNode typeNode, JCClassDecl type) {
-		if (typeNode.getKind() == Kind.TYPE) {
+		if (typeNode.getKind() == Kind.TYPE && !type.sym.isAnnotationType()) {
 			// check if the class already implements serializable (directly)
 			boolean implementsSerializable = false;
 			for (JCExpression interf : type.getImplementsClause()) {
@@ -74,13 +74,13 @@ public class HandleAutoSerializable extends JavacASTAdapter {
 
 				// add protected no-arg constructor if necessary
 				handleConstructor.generateConstructor(
-					typeNode, 
-					AccessLevel.PROTECTED, 
-					List.<JCAnnotation>nil(), 
-					List.<JavacNode>nil(), 
-					true, 
-					null, 
-					SkipIfConstructorExists.NO, 
+					typeNode,
+					AccessLevel.PROTECTED,
+					List.<JCAnnotation>nil(),
+					List.<JavacNode>nil(),
+					true,
+					null,
+					SkipIfConstructorExists.YES,
 					typeNode);
 				logger.log(Level.WARNING, "Added Serializable to " + type.getSimpleName().toString());
 			} else {
