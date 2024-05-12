@@ -32,6 +32,7 @@ public class UnitTest {
 	@Test
 	public void visibility() {
 		new BeanWithNoArgsConstructor.Implicit();
+		new TestInterface.Impl();
 	}
 
 	@Test

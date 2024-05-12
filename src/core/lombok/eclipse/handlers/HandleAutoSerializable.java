@@ -75,18 +75,20 @@ public class HandleAutoSerializable extends EclipseASTAdapter {
 				implementing.add(serializableExp(typeNode.getAst()));
 				type.superInterfaces = implementing.toArray(new TypeReference[implementing.size()]);
 
-				// add protected no-arg constructor if necessary
-				boolean hasPublicNoArgConstructor = publicNoArgsConstructorExists(typeNode);
-				if (!hasPublicNoArgConstructor) {
-					handleConstructor.generateConstructor(
-							typeNode,
-							AccessLevel.PROTECTED,
-							List.<EclipseNode>nil(),
-							true,
-							null,
-							SkipIfConstructorExists.YES,
-							List.<Annotation>nil(),
-							typeNode);
+				if (type.kind(type.modifiers) != TypeDeclaration.INTERFACE_DECL) {
+					// add protected no-arg constructor if necessary
+					boolean hasPublicNoArgConstructor = publicNoArgsConstructorExists(typeNode);
+					if (!hasPublicNoArgConstructor) {
+						handleConstructor.generateConstructor(
+								typeNode,
+								AccessLevel.PROTECTED,
+								List.<EclipseNode>nil(),
+								true,
+								null,
+								SkipIfConstructorExists.YES,
+								List.<Annotation>nil(),
+								typeNode);
+					}
 				}
 				logger.log(Level.WARNING, "Added Serializable to " + String.valueOf(type.name));
 			} else {

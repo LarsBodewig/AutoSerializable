@@ -80,18 +80,20 @@ public class HandleAutoSerializable extends JavacASTAdapter {
 				implementing.add(serializableExp(typeNode.getAst()));
 				type.implementing = implementing.toList();
 
-				// add protected no-arg constructor if necessary
-				boolean hasPublicNoArgConstructor = publicNoArgsConstructorExists(typeNode);
-				if (!hasPublicNoArgConstructor) {
-					handleConstructor.generateConstructor(
-							typeNode,
-							AccessLevel.PROTECTED,
-							List.<JCAnnotation>nil(),
-							List.<JavacNode>nil(),
-							true,
-							null,
-							SkipIfConstructorExists.YES,
-							typeNode);
+				if (!type.sym.isInterface()) {
+					// add protected no-arg constructor if necessary
+					boolean hasPublicNoArgConstructor = publicNoArgsConstructorExists(typeNode);
+					if (!hasPublicNoArgConstructor) {
+						handleConstructor.generateConstructor(
+								typeNode,
+								AccessLevel.PROTECTED,
+								List.<JCAnnotation>nil(),
+								List.<JavacNode>nil(),
+								true,
+								null,
+								SkipIfConstructorExists.YES,
+								typeNode);
+					}
 				}
 				logger.log(Level.WARNING, "Added Serializable to " + type.getSimpleName().toString());
 			} else {
