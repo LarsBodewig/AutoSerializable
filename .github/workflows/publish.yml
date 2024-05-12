@@ -21,14 +21,18 @@ jobs:
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: '19'
+        java-version: '21'
         server-id: ossrh
         server-username: MAVEN_USERNAME
         server-password: MAVEN_PASSWORD
         gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
         gpg-passphrase: MAVEN_GPG_PASSPHRASE
+    - name: Set up Ant # not available on ubuntu 2204 or earlier
+      uses: cedx/setup-ant@v2
     - name: Run the Ant Maven target
-      run: ant -noinput -buildfile build.xml maven
+      run:  |
+        ant -version
+        ant -noinput -buildfile build.xml maven
     - name: Run Maven tests
       run: |
         cd it
