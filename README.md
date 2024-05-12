@@ -1,3 +1,5 @@
+[![Available on Maven Central](https://img.shields.io/maven-central/v/dev.bodewig.autoserializable/autoserializable?label=Available%20on%20Maven%20Central)](https://central.sonatype.com/artifact/dev.bodewig.autoserializable/autoserializable)
+
 # AutoSerializable
 
 AutoSerializable is a [Lombok](https://github.com/projectlombok/lombok) fork with a single additional feature:
