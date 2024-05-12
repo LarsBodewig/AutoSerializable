@@ -1,14 +1,18 @@
 package lombok.javac.handlers;
 
 import static lombok.javac.handlers.HandleDelegate.HANDLE_DELEGATE_PRIORITY;
+import static lombok.javac.handlers.JavacHandlerUtil.annotationTypeMatches;
+import static lombok.javac.handlers.JavacHandlerUtil.upToTypeNode;
 
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCAnnotation;
 import com.sun.tools.javac.tree.JCTree.JCClassDecl;
 import com.sun.tools.javac.tree.JCTree.JCExpression;
+import com.sun.tools.javac.tree.JCTree.JCNewClass;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.ListBuffer;
 
@@ -23,6 +27,8 @@ import lombok.javac.JavacTreeMaker;
 import lombok.javac.ResolutionResetNeeded;
 import lombok.javac.handlers.HandleConstructor.SkipIfConstructorExists;
 import lombok.spi.Provides;
+
+import javax.lang.model.element.Modifier;
 
 /**
  * Provides an JavacASTAdapter to manipulate all source files. Adds
@@ -58,11 +64,13 @@ public class HandleAutoSerializable extends JavacASTAdapter {
 	 *            the type delcaration
 	 */
 	@Override public void endVisitType(JavacNode typeNode, JCClassDecl type) {
-		if (typeNode.getKind() == Kind.TYPE && !type.sym.isAnnotationType()) {
+		if (typeNode.getKind() == Kind.TYPE // is type
+				&& type.sym != null // is not anonymous
+				&& !type.sym.isAnnotationType()) { // is not annotation
 			// check if the class already implements serializable (directly)
 			boolean implementsSerializable = false;
 			for (JCExpression interf : type.getImplementsClause()) {
-				implementsSerializable |= 
+				implementsSerializable |=
 					JavacHandlerUtil.typeMatches(Serializable.class, typeNode, interf.getTree());
 			}
 			if (!implementsSerializable) {
@@ -73,19 +81,36 @@ public class HandleAutoSerializable extends JavacASTAdapter {
 				type.implementing = implementing.toList();
 
 				// add protected no-arg constructor if necessary
-				handleConstructor.generateConstructor(
-					typeNode,
-					AccessLevel.PROTECTED,
-					List.<JCAnnotation>nil(),
-					List.<JavacNode>nil(),
-					true,
-					null,
-					SkipIfConstructorExists.YES,
-					typeNode);
+				boolean hasPublicNoArgConstructor = publicNoArgsConstructorExists(typeNode);
+				if (!hasPublicNoArgConstructor) {
+					handleConstructor.generateConstructor(
+							typeNode,
+							AccessLevel.PROTECTED,
+							List.<JCAnnotation>nil(),
+							List.<JavacNode>nil(),
+							true,
+							null,
+							SkipIfConstructorExists.YES,
+							typeNode);
+				}
 				logger.log(Level.WARNING, "Added Serializable to " + type.getSimpleName().toString());
 			} else {
 				logger.log(Level.WARNING, type.getSimpleName().toString() + " already implements Serializable");
 			}
 		}
+	}
+
+	private static boolean publicNoArgsConstructorExists(JavacNode typeNode) {
+		for (JCTree def : ((JCClassDecl) typeNode.get()).defs) {
+			if (def instanceof JCTree.JCMethodDecl) {
+				JCTree.JCMethodDecl md = (JCTree.JCMethodDecl) def;
+				if (md.name.contentEquals("<init>")
+						&& md.params.size() == 0
+						&& !md.mods.getFlags().contains(Modifier.PRIVATE)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }

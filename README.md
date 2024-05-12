@@ -15,6 +15,8 @@ You can apply AutoSerializable the same way you [setup Lombok](https://projectlo
 
 Build and test: `ant maven && cd it && mvn clean test && cd ..`
 
+Install to local maven repo: `cd build && mvn install && cd ..`
+
 ---
 
 Run `git config --add include.path ../.gitconfig` to include the template config in your project config.

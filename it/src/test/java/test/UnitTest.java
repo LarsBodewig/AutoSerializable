@@ -24,6 +24,14 @@ public class UnitTest {
 
 		assertInstanceOf(Serializable.class, new BeanWithNullAnnotation());
 		assertInstanceOf(Serializable.class, new BeanWithNullAnnotation.AnnotedType());
+
+		assertInstanceOf(Serializable.class, AnonymousClass.impl);
+		assertInstanceOf(Serializable.class, AnonymousClass.second);
+	}
+
+	@Test
+	public void visibility() {
+		new BeanWithNoArgsConstructor.Implicit();
 	}
 
 	@Test

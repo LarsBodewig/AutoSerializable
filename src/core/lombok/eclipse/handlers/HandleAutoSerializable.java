@@ -5,7 +5,10 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.eclipse.jdt.internal.compiler.ast.AbstractMethodDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.Annotation;
+import org.eclipse.jdt.internal.compiler.ast.Argument;
+import org.eclipse.jdt.internal.compiler.ast.ConstructorDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.QualifiedTypeReference;
 import org.eclipse.jdt.internal.compiler.ast.TypeDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.TypeReference;
@@ -21,6 +24,7 @@ import lombok.eclipse.Eclipse;
 import lombok.eclipse.EclipseAST;
 import lombok.eclipse.EclipseASTAdapter;
 import lombok.eclipse.EclipseNode;
+import lombok.eclipse.handlers.EclipseHandlerUtil;
 import lombok.eclipse.handlers.HandleConstructor.SkipIfConstructorExists;
 import lombok.spi.Provides;
 
@@ -55,7 +59,9 @@ public class HandleAutoSerializable extends EclipseASTAdapter {
 	 *            the type delcaration
 	 */
 	@Override public void endVisitType(EclipseNode typeNode, TypeDeclaration type) {
-		if (typeNode.getKind() == Kind.TYPE  && type.kind(type.modifiers) != TypeDeclaration.ANNOTATION_TYPE_DECL) {
+		if (typeNode.getKind() == Kind.TYPE // is type
+				&& !type.binding.isAnonymousType() // is not anonymous
+				&& type.kind(type.modifiers) != TypeDeclaration.ANNOTATION_TYPE_DECL) { // is not annotation
 			// check if the class already implements serializable (directly)
 			boolean implementsSerializable = false;
 			for (TypeReference interf : type.superInterfaces) {
@@ -70,19 +76,38 @@ public class HandleAutoSerializable extends EclipseASTAdapter {
 				type.superInterfaces = implementing.toArray(new TypeReference[implementing.size()]);
 
 				// add protected no-arg constructor if necessary
-				handleConstructor.generateConstructor(
-					typeNode,
-					AccessLevel.PROTECTED,
-					List.<EclipseNode>nil(),
-					true,
-					null,
-					SkipIfConstructorExists.YES,
-					List.<Annotation>nil(),
-					typeNode);
+				boolean hasPublicNoArgConstructor = publicNoArgsConstructorExists(typeNode);
+				if (!hasPublicNoArgConstructor) {
+					handleConstructor.generateConstructor(
+							typeNode,
+							AccessLevel.PROTECTED,
+							List.<EclipseNode>nil(),
+							true,
+							null,
+							SkipIfConstructorExists.YES,
+							List.<Annotation>nil(),
+							typeNode);
+				}
 				logger.log(Level.WARNING, "Added Serializable to " + String.valueOf(type.name));
 			} else {
 				logger.log(Level.WARNING, String.valueOf(type.name) + " already implements Serializable");
 			}
 		}
+	}
+
+	private static boolean publicNoArgsConstructorExists(EclipseNode typeNode) {
+		TypeDeclaration typeDecl = (TypeDeclaration)typeNode.get();
+		if (typeDecl.methods != null) {
+			for (AbstractMethodDeclaration def : typeDecl.methods) {
+				if (def instanceof ConstructorDeclaration) {
+					Argument[] arguments = ((ConstructorDeclaration) def).arguments;
+					if ((arguments == null || arguments.length == 0)
+							&& def.modifiers != EclipseHandlerUtil.toEclipseModifier(AccessLevel.PRIVATE)) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 }
