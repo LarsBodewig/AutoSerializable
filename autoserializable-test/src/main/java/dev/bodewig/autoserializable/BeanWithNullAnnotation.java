@@ -4,21 +4,21 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
-public class BeanWithNullAnnotation {
+class BeanWithNullAnnotation {
 
     @Documented
     @Target({ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER, ElementType.LOCAL_VARIABLE})
-    public @interface Null {
+    @interface Null {
     }
 
-    public @Null String myMethod() {
+    @Null String myMethod() {
         return null;
     }
 
-    public @interface TypeAnnot {
+    @interface TypeAnnot {
     }
 
     @TypeAnnot
-    public static class AnnotedType {
+    static class AnnotedType {
     }
 }

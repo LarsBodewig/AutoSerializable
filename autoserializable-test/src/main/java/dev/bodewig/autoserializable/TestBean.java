@@ -1,10 +1,10 @@
 package dev.bodewig.autoserializable;
 
-public class TestBean {
+class TestBean {
 	private String abc = "abc";
-	public final int zero;
+	final int zero;
 
-	public TestBean(int v) {
+	TestBean(int v) {
 		zero = v;
 	}
 }

@@ -1,16 +1,16 @@
 package dev.bodewig.autoserializable;
 
-public class AnonymousClass {
-    public static final AnonymousClass impl = new AnonymousClass() {
+class AnonymousClass {
+    static final AnonymousClass impl = new AnonymousClass() {
     };
 
-    public AnonymousClass() {
+    AnonymousClass() {
         this(1);
     }
 
-    public AnonymousClass(int a) {
+    AnonymousClass(int a) {
     }
 
-    public static final AnonymousClass second = new AnonymousClass(10) {
+    static final AnonymousClass second = new AnonymousClass(10) {
     };
 }

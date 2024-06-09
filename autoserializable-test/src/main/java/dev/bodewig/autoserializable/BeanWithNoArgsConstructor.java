@@ -1,18 +1,18 @@
 package dev.bodewig.autoserializable;
 
-public abstract class BeanWithNoArgsConstructor {
+abstract class BeanWithNoArgsConstructor {
 
-	public static class Explicit {
-		public Explicit() {
+	static class Explicit {
+		Explicit() {
 		}
 	}
 	
-	public static class Implicit {
+	static class Implicit {
 	}
 	
-	public static class Inherited extends BeanWithNoArgsConstructor {
+	static class Inherited extends BeanWithNoArgsConstructor {
 	}
 
-	public BeanWithNoArgsConstructor() {
+	BeanWithNoArgsConstructor() {
 	}
 }

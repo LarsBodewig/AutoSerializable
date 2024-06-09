@@ -7,10 +7,10 @@ import java.io.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UnitTest {
+class UnitTest {
 
     @Test
-    public void instance() {
+    void instance() {
         assertInstanceOf(Serializable.class, new TestBean(0));
 
         assertInstanceOf(Serializable.class, new BeanWithNoArgsConstructor.Explicit());
@@ -25,13 +25,13 @@ public class UnitTest {
     }
 
     @Test
-    public void visibility() {
+    void visibility() {
         new BeanWithNoArgsConstructor.Implicit();
         new TestInterface.Impl();
     }
 
     @Test
-    public void write() throws IOException {
+    void write() throws IOException {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
              ObjectOutputStream oos = new ObjectOutputStream(baos)) {
             oos.writeObject(new TestBean(0));
@@ -40,7 +40,7 @@ public class UnitTest {
     }
 
     @Test
-    public void read() throws IOException, ClassNotFoundException {
+    void read() throws IOException, ClassNotFoundException {
         byte[] data;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
              ObjectOutputStream oos = new ObjectOutputStream(baos);) {
@@ -58,14 +58,20 @@ public class UnitTest {
     }
 
     @Test
-    public void customSerializer() {
+    void wasInitalized() {
+        assertNotNull(NonSerializableBean._writeObject);
+        assertNotNull(TestInterface.Impl._writeObject);
+    }
+
+    @Test
+    void customSerializer() {
         Executable trySerialize = () -> {
             try (ObjectOutputStream oos = new ObjectOutputStream(OutputStream.nullOutputStream())) {
                 oos.writeObject(new NonSerializableBean());
             }
         };
         assertThrows(NotSerializableException.class, trySerialize);
-        // TODO: UnserializableBean.SET_CUSTOM_SERIALIZER()
+        NonSerializableBean._writeObject = out -> {};
         assertDoesNotThrow(trySerialize);
     }
 }
