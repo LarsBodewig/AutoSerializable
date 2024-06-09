@@ -1,0 +1,9 @@
+# v2.0.0
+
+* Changed license
+* Reworked AutoSerializable as a ByteBuddy plugin instead of a Lombok extension
+
+
+# v1.18.32-1 (April 2024)
+
+* Initial version based on Lombok 1.18.32

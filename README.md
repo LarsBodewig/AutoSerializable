@@ -2,22 +2,29 @@
 
 # AutoSerializable
 
-AutoSerializable is a [Lombok](https://github.com/projectlombok/lombok) fork with a single additional feature:
-it marks all classes as [Serializable](https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/io/Serializable.html) during compilation.
+AutoSerializable is a [ByteBuddy](https://github.com/raphw/byte-buddy) plugin to mark all classes as [Serializable](https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/io/Serializable.html) during compilation.
 
-This feature allows you to serialize 3rd-party library classes without modifying the library code or writing custom serializers/deserializers for each class (which might not even be possible due to limitations in visiblity and modularity). You do however have to compile the library from source yourself, as the changes are applied during compilation.
+This plugin allows you to serialize 3rd-party library classes without modifying the library code or writing custom serializers/deserializers for each class (which might not even be possible due to limitations in visiblity and modularity). You do however have to shade the library, as the changes are not applied to dependencies automatically.
 
-You can apply AutoSerializable the same way you [setup Lombok](https://projectlombok.org/setup/).
+## Usage
 
-```xml
-<groupId>dev.bodewig.autoserializable</groupId>
-<artifactId>autoserializable</artifactId>
-<version>1.18.32-1</version>
+To use the plugin, you need to configure it with ByteBuddy. For example using the gradle plugin:
+
+```groovy
+plugins {
+  id 'net.bytebuddy.byte-buddy-gradle-plugin' version "$byteBuddyVersion"
+}
+
+byteBuddy {
+  transformation {
+    plugin = dev.bodewig.autoserializable.AutoSerializablePlugin.class
+  }
+}
+
+dependencies {
+  compileOnly "dev.bodewig.autoserializable:autoserializable:$autoserializableVersion"
+}
 ```
-
-Build and test: `ant maven && cd it && mvn clean test && cd ..`
-
-Install to local maven repo: `cd build && mvn install && cd ..`
 
 ---
 

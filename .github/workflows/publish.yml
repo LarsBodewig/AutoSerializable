@@ -27,20 +27,8 @@ jobs:
         server-password: MAVEN_PASSWORD
         gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
         gpg-passphrase: MAVEN_GPG_PASSPHRASE
-    - name: Set up Ant # not available on ubuntu 2204 or earlier
-      uses: cedx/setup-ant@v2
-    - name: Run the Ant Maven target
-      run:  |
-        ant -version
-        ant -noinput -buildfile build.xml maven
-    - name: Run Maven tests
-      run: |
-        cd it
-        mvn clean test
     - name: Publish to Apache Maven Central
-      run: |
-        cd build
-        mvn clean deploy -B -P release
+      run: mvn clean deploy -B -P release
       env:
         MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
