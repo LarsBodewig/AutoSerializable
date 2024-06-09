@@ -3,38 +3,10 @@
 
 # maven
 **/target/
+!.mvn/wrapper/maven-wrapper.jar
 
 # eclipse
 **/.classpath
 **/.project
 **/.settings
 **/bin
-
-# from lombok
-/testenvironment.properties
-/bin
-/build
-/dist
-/ivyCache
-/google.properties
-/debug
-/*.launch
-/findbugsReport.html
-/lib
-/.settings
-/.project
-/.classpath
-/.factorypath
-/lombok.iml
-/.idea
-*.iml
-*.markdown.html
-/junit*.properties
-/eclipse.location
-/.apt_generated/
-/out
-/website/lombokSupporters
-/pom.xml
-/jvm.locations
-/testenv
-/gpg.keyring
