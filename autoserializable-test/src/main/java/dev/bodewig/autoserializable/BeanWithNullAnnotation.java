@@ -11,7 +11,8 @@ class BeanWithNullAnnotation {
     @interface Null {
     }
 
-    @Null String myMethod() {
+    @Null
+    String myMethod() {
         return null;
     }
 

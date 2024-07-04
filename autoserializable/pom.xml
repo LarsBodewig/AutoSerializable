@@ -16,6 +16,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>dev.bodewig.autoserializable</groupId>
+            <artifactId>autoserializable-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
             <scope>provided</scope>

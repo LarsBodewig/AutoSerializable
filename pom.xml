@@ -19,6 +19,7 @@
     </properties>
 
     <modules>
+        <module>autoserializable-api</module>
         <module>autoserializable</module>
         <module>autoserializable-test</module>
     </modules>

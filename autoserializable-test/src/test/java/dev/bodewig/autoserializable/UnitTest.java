@@ -1,9 +1,9 @@
 package dev.bodewig.autoserializable;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
 import java.io.*;
+import java.lang.reflect.Field;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -58,20 +58,22 @@ class UnitTest {
     }
 
     @Test
-    void wasInitalized() {
-        assertNotNull(NonSerializableBean._writeObject);
-        assertNotNull(TestInterface.Impl._writeObject);
+    void wasInitalized() throws IllegalAccessException, NoSuchFieldException {
+        Field f1 = NonSerializableBean.class.getDeclaredField("_serializer");
+        f1.setAccessible(true);
+        assertNotNull(f1.get(null));
+
+        Field f2 = TestInterface.Impl.class.getDeclaredField("_serializer");
+        f2.setAccessible(true);
+        assertNotNull(f2.get(null));
     }
 
     @Test
     void customSerializer() {
-        Executable trySerialize = () -> {
+        assertDoesNotThrow(() -> {
             try (ObjectOutputStream oos = new ObjectOutputStream(OutputStream.nullOutputStream())) {
                 oos.writeObject(new NonSerializableBean());
             }
-        };
-        assertThrows(NotSerializableException.class, trySerialize);
-        NonSerializableBean._writeObject = out -> {};
-        assertDoesNotThrow(trySerialize);
+        });
     }
 }
