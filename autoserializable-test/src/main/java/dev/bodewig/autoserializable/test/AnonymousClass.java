@@ -1,4 +1,4 @@
-package dev.bodewig.autoserializable;
+package dev.bodewig.autoserializable.test;
 
 class AnonymousClass {
     static final AnonymousClass impl = new AnonymousClass() {

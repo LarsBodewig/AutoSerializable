@@ -1,4 +1,4 @@
-package dev.bodewig.autoserializable;
+package dev.bodewig.autoserializable.test;
 
 import java.io.Serializable;
 

@@ -1,4 +1,4 @@
-package dev.bodewig.autoserializable;
+package dev.bodewig.autoserializable.test;
 
 import dev.bodewig.autoserializable.api.AutoSerializable;
 import dev.bodewig.autoserializable.api.AutoSerializer;

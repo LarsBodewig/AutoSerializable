@@ -2,7 +2,7 @@ package dev.bodewig.autoserializable.api;
 
 import java.lang.annotation.*;
 
-@Retention(RetentionPolicy.CLASS)
+@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Repeatable(AutoSerializableAll.class)
 public @interface AutoSerializable {
