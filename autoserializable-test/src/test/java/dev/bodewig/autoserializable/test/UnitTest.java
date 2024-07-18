@@ -1,5 +1,6 @@
 package dev.bodewig.autoserializable.test;
 
+import dev.bodewig.autoserializable.junit.AutoSerializableTestFactory;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
@@ -31,16 +32,12 @@ class UnitTest {
     }
 
     @Test
-    void write() throws IOException {
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-             ObjectOutputStream oos = new ObjectOutputStream(baos)) {
-            oos.writeObject(new TestBean(0));
-            oos.flush();
-        }
+    void writeRead() {
+        AutoSerializableTestFactory.testSerialization(new TestBean(0));
     }
 
     @Test
-    void read() throws IOException, ClassNotFoundException {
+    void data() throws IOException, ClassNotFoundException {
         byte[] data;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
              ObjectOutputStream oos = new ObjectOutputStream(baos);) {
@@ -70,10 +67,6 @@ class UnitTest {
 
     @Test
     void customSerializer() {
-        assertDoesNotThrow(() -> {
-            try (ObjectOutputStream oos = new ObjectOutputStream(OutputStream.nullOutputStream())) {
-                oos.writeObject(new NonSerializableBean());
-            }
-        });
+        AutoSerializableTestFactory.testSerialization(new NonSerializableBean());
     }
 }

@@ -10,6 +10,7 @@
         <version>2.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>autoserializable-test</artifactId>
+    <name>AutoSerializable Test</name>
 
     <dependencies>
         <dependency>
@@ -28,31 +29,26 @@
             <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.badlogicgames.gdx</groupId>
+            <artifactId>gdx-jnigen-loader</artifactId>
+            <version>2.5.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.badlogicgames.gdx</groupId>
+            <artifactId>gdx-backend-lwjgl3</artifactId>
+            <version>1.12.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.classgraph</groupId>
+            <artifactId>classgraph</artifactId>
+            <version>4.8.174</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>net.bytebuddy</groupId>
-                <artifactId>byte-buddy-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>transform</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <transformations>
-                        <transformation>
-                            <groupId>dev.bodewig.autoserializable</groupId>
-                            <artifactId>autoserializable</artifactId>
-                            <version>${project.version}</version>
-                            <plugin>dev.bodewig.autoserializable.AutoSerializablePlugin</plugin>
-                        </transformation>
-                    </transformations>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-install-plugin</artifactId>
@@ -71,11 +67,159 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <dependenciesToScan>
-                        <dependency>dev.bodewig.autoserializable:autoserializable-junit</dependency>
-                    </dependenciesToScan>
+                    <skip>true</skip>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>maven</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>3.7.0</version>
+                        <executions>
+                            <execution>
+                                <id>pull-dependencies</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <attach>false</attach>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>dependencies</finalName>
+                            <inlineDescriptors>
+                                <inlineDescriptor>
+                                    <id>pull-dependencies</id>
+                                    <formats>
+                                        <format>dir</format>
+                                    </formats>
+                                    <includeBaseDirectory>false</includeBaseDirectory>
+                                    <dependencySets>
+                                        <dependencySet>
+                                            <unpack>true</unpack>
+                                            <useProjectArtifact>false</useProjectArtifact>
+                                            <includes>
+                                                <include>
+                                                    com.badlogicgames.gdx:gdx-jnigen-loader
+                                                </include>
+                                                <include>com.badlogicgames.gdx:*</include>
+                                            </includes>
+                                        </dependencySet>
+                                    </dependencySets>
+                                </inlineDescriptor>
+                            </inlineDescriptors>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>net.bytebuddy</groupId>
+                        <artifactId>byte-buddy-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>transform</goal>
+                                    <goal>transform-location</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <transformations>
+                                <transformation>
+                                    <groupId>dev.bodewig.autoserializable</groupId>
+                                    <artifactId>autoserializable</artifactId>
+                                    <version>${project.version}</version>
+                                    <plugin>dev.bodewig.autoserializable.AutoSerializablePlugin</plugin>
+                                </transformation>
+                            </transformations>
+                            <source>${project.build.directory}/dependencies</source>
+                            <target>${project.build.outputDirectory}</target>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                            <dependenciesToScan>
+                                <dependency>dev.bodewig.autoserializable:autoserializable-junit</dependency>
+                            </dependenciesToScan>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>gradle</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.3.0</version>
+                        <executions>
+                            <execution>
+                                <id>gradle-clean</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>clean</phase>
+                                <configuration>
+                                    <executable>./gradlew</executable>
+                                    <arguments>
+                                        <argument>clean</argument>
+                                        <argument>-Pversion=${project.version}</argument>
+                                        <argument>--stacktrace</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>gradle-build</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <executable>./gradlew</executable>
+                                    <arguments>
+                                        <argument>assemble</argument>
+                                        <argument>-Pversion=${project.version}</argument>
+                                        <argument>--stacktrace</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>gradle-test</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>test</phase>
+                                <configuration>
+                                    <executable>./gradlew</executable>
+                                    <arguments>
+                                        <argument>test</argument>
+                                        <argument>-Pversion=${project.version}</argument>
+                                        <argument>--stacktrace</argument>
+                                    </arguments>
+                                    <skip>${maven.test.skip}</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

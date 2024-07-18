@@ -6,6 +6,8 @@ import dev.bodewig.autoserializable.api.MissingAnnotationException;
 import net.bytebuddy.build.Plugin;
 import net.bytebuddy.description.annotation.AnnotationDescription;
 import net.bytebuddy.description.modifier.FieldManifestation;
+import net.bytebuddy.description.modifier.ModifierContributor.ForType;
+import net.bytebuddy.description.modifier.ModifierContributor.Resolver;
 import net.bytebuddy.description.modifier.Ownership;
 import net.bytebuddy.description.modifier.Visibility;
 import net.bytebuddy.description.type.TypeDescription;
@@ -73,7 +75,9 @@ public class AutoSerializablePlugin implements Plugin.WithPreprocessor {
 
         // make all private types package private
         if (typeDescription.isPrivate()) {
-            builder = builder.modifiers(Visibility.PACKAGE_PRIVATE);
+            Resolver<ForType> modResolver = Resolver.of((ForType) Visibility.PACKAGE_PRIVATE);
+            int modifier = modResolver.resolve(typeDescription.getModifiers());
+            builder = builder.modifiers(modifier);
         }
 
         // implements Serializable
@@ -99,7 +103,7 @@ public class AutoSerializablePlugin implements Plugin.WithPreprocessor {
                     typeDescription.getCanonicalName());
         }
 
-        // private static AutoSerializer _serializer;
+        // private static final AutoSerializer _serializer;
         builder = builder.defineField(FIELD_NAME, TypeDescription.Generic.Builder.rawType(AutoSerializer.class).build(),
                 Visibility.PRIVATE, Ownership.STATIC, FieldManifestation.FINAL);
 
@@ -108,7 +112,9 @@ public class AutoSerializablePlugin implements Plugin.WithPreprocessor {
                 MethodCall.construct(serializer.getDeclaredMethods().filter(isDefaultConstructor()).getOnly())
                         .setsField(named(FIELD_NAME)));
 
-        // private void writeObject(java.io.ObjectOutputStream out) throws IOException
+        // private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+        //     _serializer.writeObject(out, this);
+        // }
         try {
             builder = builder.defineMethod("writeObject", void.class, Opcodes.ACC_PRIVATE)
                     .withParameter(ObjectOutputStream.class, "out").throwing(IOException.class).intercept(
@@ -119,7 +125,9 @@ public class AutoSerializablePlugin implements Plugin.WithPreprocessor {
             throw new RuntimeException(e);
         }
 
-        // private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+        // private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        //     _serializer.readObject(in, this);
+        // }
         try {
             builder = builder.defineMethod("readObject", void.class, Opcodes.ACC_PRIVATE)
                     .withParameter(ObjectInputStream.class, "in")

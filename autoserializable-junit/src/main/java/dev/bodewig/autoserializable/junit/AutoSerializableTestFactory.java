@@ -10,15 +10,15 @@ import org.junit.platform.commons.util.ClassFilter;
 import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.io.*;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.net.URI;
-import java.util.HashSet;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,7 +29,11 @@ public class AutoSerializableTestFactory {
     protected Set<Class<?>> serializers;
     protected Stream<DynamicTest> tests;
 
-    public AutoSerializableTestFactory(URI sources) {
+    public AutoSerializableTestFactory(URI... sources) {
+        this(List.of(sources));
+    }
+
+    public AutoSerializableTestFactory(Collection<URI> sources) {
         classes = findClasses(sources);
         serializers = findSerializers(sources);
         tests = Stream.empty();
@@ -50,19 +54,21 @@ public class AutoSerializableTestFactory {
                                 Optional.ofNullable(clazz.getCanonicalName()).orElse("(anonymous class)")))));
     }
 
-    protected Set<Class<?>> findClasses(URI uri) {
-        return new HashSet<>(ReflectionUtils.findAllClassesInClasspathRoot(uri, x -> true, x -> true));
+    protected Set<Class<?>> findClasses(Collection<URI> uris) {
+        return uris.stream()
+                .flatMap(uri -> ReflectionUtils.findAllClassesInClasspathRoot(uri, x -> true, x -> true).stream())
+                .collect(Collectors.toSet());
     }
 
-    protected Set<Class<?>> findSerializers(URI uri) {
-        return new HashSet<>(ReflectionUtils.findAllClassesInClasspathRoot(uri, ClassFilter.of(
+    protected Set<Class<?>> findSerializers(Collection<URI> uris) {
+        return uris.stream().flatMap(uri -> ReflectionUtils.findAllClassesInClasspathRoot(uri, ClassFilter.of(
                 clazz -> AnnotationUtils.isAnnotated(clazz, AutoSerializable.class) ||
                         AnnotationUtils.isAnnotated(clazz, AutoSerializableAll.class) ||
-                        AutoSerializer.class.isAssignableFrom(clazz))));
+                        AutoSerializer.class.isAssignableFrom(clazz))).stream()).collect(Collectors.toSet());
     }
 
-    protected Function<Class<?>, String> nameGenerator(String method) {
-        return clazz -> method + "_" + clazz.getSimpleName();
+    protected static Function<Class<?>, String> nameGenerator(String method) {
+        return clazz -> method + "_" + clazz.getName().substring(clazz.getName().lastIndexOf('.') + 1);
     }
 
     public Stream<DynamicTest> build() {
@@ -119,30 +125,29 @@ public class AutoSerializableTestFactory {
                 });
     }
 
-    public AutoSerializableTestFactory testClassesWithNoArgConstructorReadWrite() {
-        return test(
-                classes.stream().filter(Predicate.not(serializers::contains)).filter(Predicate.not(Class::isInterface))
-                        .filter(clazz -> !Modifier.isAbstract(clazz.getModifiers())).filter(clazz -> {
-                            try {
-                                clazz.getDeclaredConstructor();
-                            } catch (NoSuchMethodException e) {
-                                return false;
-                            }
-                            return true;
-                        }), "testAllClassesReadWrite", clazz -> {
-                    Constructor<?> constructor = clazz.getDeclaredConstructor();
-                    constructor.setAccessible(true);
-                    Object instance = constructor.newInstance();
-                    byte[] data;
-                    try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                         ObjectOutputStream oos = new ObjectOutputStream(baos)) {
-                        oos.writeObject(instance);
-                        data = baos.toByteArray();
-                    }
-                    try (ByteArrayInputStream bais = new ByteArrayInputStream(data);
-                         ObjectInputStream ois = new ObjectInputStream(bais)) {
-                        ois.readObject();
-                    }
-                });
+    public static Stream<DynamicTest> testSerialization(Object... instances) {
+        return testSerialization(List.of(instances));
+    }
+
+    public static Stream<DynamicTest> testSerialization(Collection<Object> instances) {
+        return DynamicTest.stream(instances.stream(),
+                instance -> "testSerialization_" + instance.getClass().getSimpleName(),
+                AutoSerializableTestFactory::testSerialization);
+    }
+
+    public static void testSerialization(Object instance) {
+        assertDoesNotThrow(() -> {
+            byte[] data;
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                 ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+                oos.writeObject(instance);
+                data = baos.toByteArray();
+            }
+            try (ByteArrayInputStream bais = new ByteArrayInputStream(data);
+                 ObjectInputStream ois = new ObjectInputStream(bais)) {
+                ois.readObject();
+            }
+        }, "testSerialization failed on " +
+                Optional.ofNullable(instance.getClass().getCanonicalName()).orElse("(anonymous class)"));
     }
 }

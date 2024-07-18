@@ -10,3 +10,7 @@
 **/.project
 **/.settings
 **/bin
+
+# gradle
+**/build/
+**/.gradle/

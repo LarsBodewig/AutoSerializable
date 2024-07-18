@@ -1,26 +1,26 @@
 package dev.bodewig.autoserializable.test;
 
 import dev.bodewig.autoserializable.junit.AutoSerializableTestFactory;
-import org.junit.jupiter.api.DisplayName;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ScanResult;
 import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.TestFactory;
-import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.net.URI;
+import java.util.List;
 import java.util.stream.Stream;
 
-@DisplayName("AutoSerializable Test")
-@Tag("autoserializable")
-public class AutoSerializableJUnitTest {
+class AutoSerializableJUnitTest {
 
     @TestFactory
-    public Stream<DynamicTest> testAll() {
-        URI sources =
-                ReflectionUtils.getAllClasspathRootDirectories().stream().filter(path -> !path.endsWith("test-classes"))
-                        .findAny().get().toUri(); // TODO: change to mvn
-        return new AutoSerializableTestFactory(sources).testAllClassesImplementSerializable()
-                .testSerializersAnnotated().testSerializersExtend().testSerializersUsed()
-                .testAutoSerializablesInitialized().testClassesWithNoArgConstructorReadWrite().build();
+    Stream<DynamicTest> testAll() {
+        List<URI> sources;
+        try (ScanResult scanResult = new ClassGraph().ignoreClassVisibility().filterClasspathElements(
+                path -> path.endsWith("/target/classes") || path.endsWith("/build/classes/java/main")
+                        || path.contains("/build/transformedJars")).scan()) {
+            sources = scanResult.getClasspathURIs();
+        }
+        return new AutoSerializableTestFactory(sources).testAllClassesImplementSerializable().testSerializersAnnotated()
+                .testSerializersExtend().testSerializersUsed().testAutoSerializablesInitialized().build();
     }
 }
