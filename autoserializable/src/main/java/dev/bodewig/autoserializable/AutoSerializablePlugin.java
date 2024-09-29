@@ -1,6 +1,7 @@
 package dev.bodewig.autoserializable;
 
 import dev.bodewig.autoserializable.api.AutoSerializable;
+import dev.bodewig.autoserializable.api.AutoSerialized;
 import dev.bodewig.autoserializable.api.AutoSerializer;
 import dev.bodewig.autoserializable.api.MissingAnnotationException;
 import net.bytebuddy.build.Plugin;
@@ -72,6 +73,9 @@ public class AutoSerializablePlugin implements Plugin.WithPreprocessor {
         if (typeDescription.isAssignableTo(AutoSerializer.class)) {
             return builder;
         }
+
+        // mark type as AutoSerialized
+        builder = builder.annotateType(AnnotationDescription.Builder.ofType(AutoSerialized.class).build());
 
         // make all private types package private
         if (typeDescription.isPrivate()) {

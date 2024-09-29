@@ -2,6 +2,7 @@ package dev.bodewig.autoserializable.junit;
 
 import dev.bodewig.autoserializable.api.AutoSerializable;
 import dev.bodewig.autoserializable.api.AutoSerializableAll;
+import dev.bodewig.autoserializable.api.AutoSerialized;
 import dev.bodewig.autoserializable.api.AutoSerializer;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.function.ThrowingConsumer;
@@ -62,8 +63,8 @@ public class AutoSerializableTestFactory {
 
     protected Set<Class<?>> findSerializers(Collection<URI> uris) {
         return uris.stream().flatMap(uri -> ReflectionUtils.findAllClassesInClasspathRoot(uri, ClassFilter.of(
-                clazz -> AnnotationUtils.isAnnotated(clazz, AutoSerializable.class) ||
-                        AnnotationUtils.isAnnotated(clazz, AutoSerializableAll.class) ||
+                clazz -> clazz.isAnnotationPresent(AutoSerializable.class) ||
+                        clazz.isAnnotationPresent(AutoSerializableAll.class) ||
                         AutoSerializer.class.isAssignableFrom(clazz))).stream()).collect(Collectors.toSet());
     }
 
@@ -91,8 +92,8 @@ public class AutoSerializableTestFactory {
 
     public AutoSerializableTestFactory testSerializersExtend() {
         return test(serializers.stream(), "testSerializersExtend", serializer -> assertTrue(
-                AnnotationUtils.isAnnotated(serializer, AutoSerializable.class) ||
-                        AnnotationUtils.isAnnotated(serializer, AutoSerializableAll.class),
+                serializer.isAnnotationPresent(AutoSerializable.class) ||
+                        serializer.isAnnotationPresent(AutoSerializableAll.class),
                 "Class " + serializer.getCanonicalName() + " extends " + AutoSerializer.class.getCanonicalName() +
                         " but is not annotated with " + AutoSerializable.class));
     }
@@ -123,6 +124,13 @@ public class AutoSerializableTestFactory {
                             "Generated constant '_serializer' of " + clazz.getCanonicalName() +
                                     " was not initialized. The byte code is defect.");
                 });
+    }
+
+    public AutoSerializableTestFactory testAnnotatedAutoSerialized() {
+        return test(classes.stream().filter(Predicate.not(serializers::contains)), "testAnnotatedAutoSerialized",
+                clazz -> assertTrue(clazz.isAnnotationPresent(AutoSerialized.class),
+                        "Type " + clazz.getCanonicalName() + " was not annotated with " +
+                                AutoSerialized.class.getCanonicalName()));
     }
 
     public static Stream<DynamicTest> testSerialization(Object... instances) {
