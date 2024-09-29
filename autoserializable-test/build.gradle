@@ -12,8 +12,8 @@ buildscript {
 }
 
 plugins {
-	id 'java-library'
-	id 'net.bytebuddy.byte-buddy-gradle-plugin' version '1.15.3'
+    id 'java-library'
+    id 'net.bytebuddy.byte-buddy-gradle-plugin' version '1.15.3'
 }
 
 java {
@@ -29,8 +29,8 @@ def pull = tasks.create('pullJars', Copy) {
     into layout.buildDirectory.dir('pulledJars')
 }
 
-import net.bytebuddy.build.gradle.ByteBuddyJarsTask
 import dev.bodewig.autoserializable.AutoSerializablePlugin
+import net.bytebuddy.build.gradle.ByteBuddyJarsTask
 
 def byteBuddyJar = tasks.create("byteBuddyJar", ByteBuddyJarsTask) {
     source = file("build/pulledJars/")

@@ -1,14 +1,14 @@
 pluginManagement {
-	repositories {
-		mavenLocal()
-		mavenCentral()
-		gradlePluginPortal()
-	}
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        gradlePluginPortal()
+    }
 }
 dependencyResolutionManagement {
-	repositories {
-		mavenLocal()
-		mavenCentral()
-		gradlePluginPortal()
-	}
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        gradlePluginPortal()
+    }
 }
