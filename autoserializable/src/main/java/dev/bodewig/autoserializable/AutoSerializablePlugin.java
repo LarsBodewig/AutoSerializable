@@ -7,14 +7,11 @@ import dev.bodewig.autoserializable.api.MissingAnnotationException;
 import net.bytebuddy.build.Plugin;
 import net.bytebuddy.description.annotation.AnnotationDescription;
 import net.bytebuddy.description.modifier.FieldManifestation;
-import net.bytebuddy.description.modifier.ModifierContributor.ForType;
-import net.bytebuddy.description.modifier.ModifierContributor.Resolver;
 import net.bytebuddy.description.modifier.Ownership;
 import net.bytebuddy.description.modifier.Visibility;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.ClassFileLocator;
 import net.bytebuddy.dynamic.DynamicType;
-import net.bytebuddy.dynamic.Transformer;
 import net.bytebuddy.implementation.MethodCall;
 import net.bytebuddy.jar.asm.Opcodes;
 
@@ -31,7 +28,7 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
 /**
  * A Byte-Buddy plugin to mark all classes and interfaces as Serializable.
  */
-public class AutoSerializablePlugin implements Plugin.WithPreprocessor {
+public class AutoSerializablePlugin extends NonPrivatePlugin implements Plugin.WithPreprocessor {
 
     private static final String FIELD_NAME = "_serializer";
 
@@ -69,6 +66,9 @@ public class AutoSerializablePlugin implements Plugin.WithPreprocessor {
     @Override
     public DynamicType.Builder<?> apply(DynamicType.Builder<?> builder, TypeDescription typeDescription,
                                         ClassFileLocator classFileLocator) {
+        // make all private types and fields package-private
+        builder = super.apply(builder, typeDescription, classFileLocator);
+
         // serializers should not be made serializable
         if (typeDescription.isAssignableTo(AutoSerializer.class)) {
             return builder;
@@ -76,13 +76,6 @@ public class AutoSerializablePlugin implements Plugin.WithPreprocessor {
 
         // mark type as AutoSerialized
         builder = builder.annotateType(AnnotationDescription.Builder.ofType(AutoSerialized.class).build());
-
-        // make all private types package private
-        if (typeDescription.isPrivate()) {
-            Resolver<ForType> modResolver = Resolver.of((ForType) Visibility.PACKAGE_PRIVATE);
-            int modifier = modResolver.resolve(typeDescription.getModifiers());
-            builder = builder.modifiers(modifier);
-        }
 
         // implements Serializable
         boolean implementsSerializable =
@@ -95,9 +88,6 @@ public class AutoSerializablePlugin implements Plugin.WithPreprocessor {
         if (typeDescription.isInterface()) {
             return builder;
         }
-
-        // make all private fields package private
-        builder = builder.field(isPrivate()).transform(Transformer.ForField.withModifiers(Visibility.PACKAGE_PRIVATE));
 
         // find annotated AutoSerializer or use DefaultSerializer
         TypeDescription serializer = TypeDescription.ForLoadedType.of(AutoSerializer.DefaultSerializer.class);
@@ -144,10 +134,5 @@ public class AutoSerializablePlugin implements Plugin.WithPreprocessor {
         }
 
         return builder;
-    }
-
-    @Override
-    public void close() {
-        // no-op
     }
 }
