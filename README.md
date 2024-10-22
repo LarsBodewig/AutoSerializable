@@ -3,7 +3,7 @@
 # AutoSerializable
 
 AutoSerializable is a [ByteBuddy](https://github.com/raphw/byte-buddy) plugin to mark all classes
-as [Serializable](https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/io/Serializable.html) during
+as [Serializable](https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/io/Serializable.html) even after
 compilation.
 
 This plugin allows you to serialize 3rd-party library classes without modifying the library code or writing custom
