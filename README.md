@@ -8,27 +8,15 @@ compilation.
 
 This plugin allows you to serialize 3rd-party library classes without modifying the library code or writing custom
 serializers/deserializers for each class (which might not even be possible due to limitations in visiblity and
-modularity). You do however have to shade the library, as the changes are not applied to dependencies automatically.
+modularity).
 
 ## Usage
 
-To use the plugin, you need to configure it with ByteBuddy. For example using the gradle plugin:
+To use the plugin, you need to configure it with ByteBuddy. ByteBuddy offers plugins for maven and gradle with different
+mojos and tasks to transform class files or whole JARs.
 
-```groovy
-plugins {
-  id 'net.bytebuddy.byte-buddy-gradle-plugin' version "$byteBuddyVersion"
-}
-
-byteBuddy {
-  transformation {
-    plugin = dev.bodewig.autoserializable.AutoSerializablePlugin.class
-  }
-}
-
-dependencies {
-  compileOnly "dev.bodewig.autoserializable:autoserializable:$autoserializableVersion"
-}
-```
+You can find examples for maven and gradle in the *autoserializable-test* project.
+For gradle, however, the most comfortable way is to create a precompiled plugin.
 
 ---
 
