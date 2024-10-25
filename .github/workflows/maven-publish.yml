@@ -6,7 +6,7 @@
 # - MAVEN_GPG_PASSPHRASE:  your GPG passphrase
 # - MAVEN_GPG_PRIVATE_KEY: your GPG private key
 
-name: Publish
+name: Maven Publish
 on:
   workflow_dispatch:
 jobs:
@@ -27,6 +27,8 @@ jobs:
           server-password: MAVEN_PASSWORD
           gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
       - name: Publish to Apache Maven Central
         run: ./mvnw clean deploy -B -P release
         env:
