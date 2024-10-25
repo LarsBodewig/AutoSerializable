@@ -6,7 +6,7 @@
 # - MAVEN_GPG_PASSPHRASE:  your GPG passphrase
 # - MAVEN_GPG_PRIVATE_KEY: your GPG private key
 
-name: Publish
+name: Maven Publish
 on:
   workflow_dispatch:
 jobs:
