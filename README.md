@@ -1,4 +1,4 @@
-[![Available on Maven Central](https://img.shields.io/maven-central/v/dev.bodewig.autoserializable/autoserializable?label=Available%20on%20Maven%20Central)](https://central.sonatype.com/artifact/dev.bodewig.autoserializable/autoserializable)
+[![Available on Maven Central](https://img.shields.io/maven-central/v/dev.bodewig.autoserializable/autoserializable?label=Available%20on%20Maven%20Central)](https://central.sonatype.com/namespace/dev.bodewig.autoserializable)
 
 # AutoSerializable
 
