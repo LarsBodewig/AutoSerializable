@@ -149,7 +149,7 @@ public class AutoSerializableTestFactory {
      * @return the factory instance
      */
     public AutoSerializableTestFactory testAllClassesImplementSerializable() {
-        return test(classes.stream().filter(Predicate.not(serializers::contains)),
+        return test(classes.stream().filter(clazz -> !clazz.isAnnotation() && !serializers.contains(clazz)),
                 "testAllClassesImplementSerializable", clazz -> assertTrue(Serializable.class.isAssignableFrom(clazz),
                         clazz.getCanonicalName() + " does not implement " + Serializable.class.getCanonicalName()));
     }
@@ -205,7 +205,8 @@ public class AutoSerializableTestFactory {
      */
     public AutoSerializableTestFactory testAutoSerializablesInitialized() {
         return test(
-                classes.stream().filter(Predicate.not(serializers::contains)).filter(Predicate.not(Class::isInterface))
+                classes.stream().filter(clazz ->
+                                !clazz.isAnnotation() && !clazz.isInterface() && !serializers.contains(clazz))
                         .filter(clazz -> {
                             try {
                                 clazz.getDeclaredField("_serializer");
@@ -229,7 +230,8 @@ public class AutoSerializableTestFactory {
      * @return the factory instance
      */
     public AutoSerializableTestFactory testAnnotatedAutoSerialized() {
-        return test(classes.stream().filter(Predicate.not(serializers::contains)), "testAnnotatedAutoSerialized",
+        return test(classes.stream().filter(clazz -> !clazz.isAnnotation() && !serializers.contains(clazz)),
+                "testAnnotatedAutoSerialized",
                 clazz -> assertTrue(clazz.isAnnotationPresent(AutoSerialized.class),
                         "Type " + clazz.getCanonicalName() + " was not annotated with " +
                                 AutoSerialized.class.getCanonicalName()));

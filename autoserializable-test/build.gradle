@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "dev.bodewig.autoserializable:autoserializable:2.0.0-SNAPSHOT"
+        classpath "dev.bodewig.autoserializable:autoserializable:$version"
         classpath 'net.bytebuddy:byte-buddy-gradle-plugin:1.15.3'
         classpath 'org.lwjgl:lwjgl-vulkan:3.3.3'
         classpath fileTree('build/pulledJars') { include '*.jar' }
