@@ -18,6 +18,12 @@ mojos and tasks to transform class files or whole JARs.
 You can find examples for maven and gradle in the *autoserializable-test* project.
 For gradle, however, the most comfortable way is to create a precompiled plugin.
 
+### Custom serializers
+
+To inject custom serializers/deserializers into a class, your class has to implement `AutoSerializer` and be annotated
+with `@AutoSerializable`. The class has to be part of the `source` processed by byte-buddy or be available on the
+classpath during plugin execution. The class has to be public.
+
 ---
 
 Run `git config --add include.path ../.gitconfig` to include the template config in your project config.
