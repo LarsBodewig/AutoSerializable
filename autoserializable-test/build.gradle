@@ -1,67 +1,14 @@
-buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-    }
-    dependencies {
-        classpath "dev.bodewig.autoserializable:autoserializable:$version"
-        classpath 'net.bytebuddy:byte-buddy-gradle-plugin:1.15.11'
-        classpath 'org.lwjgl:lwjgl-vulkan:3.3.3'
-        classpath fileTree('build/pulledJars') { include '*.jar' }
-    }
-}
-
 plugins {
     id 'java-library'
-    id 'net.bytebuddy.byte-buddy-gradle-plugin' version '1.15.11'
+    id 'dev.bodewig.autoserializable' version "$version"
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_19
 }
 
-configurations {
-    pullJar
-}
-
-def pull = tasks.create('pullJars', Copy) {
-    from configurations.pullJar
-    into layout.buildDirectory.dir('pulledJars')
-}
-
-import dev.bodewig.autoserializable.AutoSerializablePlugin
-import net.bytebuddy.build.gradle.ByteBuddyJarsTask
-
-def byteBuddyJar = tasks.create("byteBuddyJar", ByteBuddyJarsTask) {
-    source = file("build/pulledJars/")
-    target = file("build/transformedJars/")
-    classPath = project.getBuildscript().getConfigurations().getByName(ScriptHandler.CLASSPATH_CONFIGURATION)
-    transformation {
-        plugin = AutoSerializablePlugin
-    }
-    dependsOn pull
-}
-
-tasks.named('assemble').configure {
-    dependsOn byteBuddyJar
-}
-
-tasks.named('test', Test) {
-    useJUnitPlatform()
-    testLogging {
-        events 'failed', 'skipped'//, 'passed'
-    }
-}
-
 dependencies {
-    byteBuddy "dev.bodewig.autoserializable:autoserializable:$version"
-    compileOnly "dev.bodewig.autoserializable:autoserializable-api:$version"
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.10.1'
-    testImplementation "dev.bodewig.autoserializable:autoserializable-junit:$version"
-    testImplementation 'io.github.classgraph:classgraph:4.8.174'
-    pullJar "com.badlogicgames.gdx:gdx:1.12.1"
-    testImplementation fileTree('build/transformedJars') { include '*.jar' }
+    autoSerializable "com.badlogicgames.gdx:gdx:1.12.1"
 }
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
