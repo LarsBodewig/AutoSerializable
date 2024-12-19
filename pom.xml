@@ -22,6 +22,7 @@
         <module>autoserializable-api</module>
         <module>autoserializable</module>
         <module>autoserializable-junit</module>
+        <module>autoserializable-gradle-plugin-wrapper</module>
         <module>autoserializable-test</module>
     </modules>
 
@@ -91,6 +92,11 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.3.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
                     <version>3.3.0</version>
                 </plugin>
             </plugins>

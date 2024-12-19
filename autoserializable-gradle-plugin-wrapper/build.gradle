@@ -1,0 +1,52 @@
+buildscript {
+    group = "$groupId"
+}
+
+plugins {
+    id 'java-gradle-plugin'
+    id 'maven-publish'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    gradlePluginPortal()
+}
+
+dependencies {
+    implementation "net.bytebuddy:byte-buddy-gradle-plugin:$byteBuddyVersion"
+    implementation "dev.bodewig.autoserializable:autoserializable:$version"
+    compileOnly "dev.bodewig.autoserializable:autoserializable-api:$version"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_19
+    withJavadocJar()
+    withSourcesJar()
+}
+
+gradlePlugin {
+    plugins {
+        compilefromsource {
+            id = 'dev.bodewig.autoserializable'
+            tags.set(['dependencies', 'configuration', 'build', 'java'])
+            implementationClass = 'dev.bodewig.autoserializable.gradle.plugin.AutoSerializableGradlePlugin'
+        }
+    }
+}
+
+publishing.publications.withType(MavenPublication) { pub ->
+    pom.withXml {
+        def pom = asNode()
+        def parent = pom.appendNode('parent')
+        parent.appendNode('groupId', "$group")
+        parent.appendNode('artifactId', 'autoserializable-parent')
+        parent.appendNode('version', "$version")
+        pom.remove(pom.get('groupId'))
+        pom.remove(pom.get('version'))
+        pom.appendNode('name', 'AutoSerializable gradle plugin')
+        pom.appendNode('description', 'Adds a configuration to make dependencies serializable')
+    }
+}
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'

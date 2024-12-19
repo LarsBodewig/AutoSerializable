@@ -20,8 +20,9 @@
         </dependency>
         <dependency>
             <groupId>dev.bodewig.autoserializable</groupId>
-            <artifactId>autoserializable-junit</artifactId>
+            <artifactId>autoserializable-gradle-plugin-wrapper</artifactId>
             <version>${project.version}</version>
+            <type>pom</type>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -167,7 +168,6 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
-                        <version>3.3.0</version>
                         <executions>
                             <execution>
                                 <id>gradle-clean</id>
