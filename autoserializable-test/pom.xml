@@ -176,7 +176,7 @@
                                 </goals>
                                 <phase>clean</phase>
                                 <configuration>
-                                    <executable>./gradlew</executable>
+                                    <executable>../gradlew</executable>
                                     <arguments>
                                         <argument>clean</argument>
                                         <argument>-Pversion=${project.version}</argument>
@@ -191,7 +191,7 @@
                                 </goals>
                                 <phase>compile</phase>
                                 <configuration>
-                                    <executable>./gradlew</executable>
+                                    <executable>../gradlew</executable>
                                     <arguments>
                                         <argument>assemble</argument>
                                         <argument>-Pversion=${project.version}</argument>
@@ -206,7 +206,7 @@
                                 </goals>
                                 <phase>test</phase>
                                 <configuration>
-                                    <executable>./gradlew</executable>
+                                    <executable>../gradlew</executable>
                                     <arguments>
                                         <argument>test</argument>
                                         <argument>-Pversion=${project.version}</argument>
