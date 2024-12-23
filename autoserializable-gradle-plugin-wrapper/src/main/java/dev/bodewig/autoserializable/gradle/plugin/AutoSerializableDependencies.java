@@ -25,7 +25,8 @@ public final class AutoSerializableDependencies {
      */
     public static final String VERSION = "2.0.1-SNAPSHOT";
 
-    private AutoSerializableDependencies() {}
+    private AutoSerializableDependencies() {
+    }
 
     /**
      * Creates a dependency for the autoserializable-api
@@ -35,9 +36,8 @@ public final class AutoSerializableDependencies {
      */
     public static Dependency autoserializableApi(Project project) {
         return project.getDependencies()
-                .create(AutoSerializableDependencies.GROUP_ID + ":" +
-                        AutoSerializableDependencies.API_ARTIFACT_ID + ":" +
-                        AutoSerializableDependencies.VERSION);
+                .create(AutoSerializableDependencies.GROUP_ID + ":" + AutoSerializableDependencies.API_ARTIFACT_ID +
+                        ":" + AutoSerializableDependencies.VERSION);
     }
 
     /**
@@ -48,8 +48,7 @@ public final class AutoSerializableDependencies {
      */
     public static Dependency autoserializableJunit(Project project) {
         return project.getDependencies()
-                .create(AutoSerializableDependencies.GROUP_ID + ":" +
-                        AutoSerializableDependencies.JUNIT_ARTIFACT_ID + ":" +
-                        AutoSerializableDependencies.VERSION);
+                .create(AutoSerializableDependencies.GROUP_ID + ":" + AutoSerializableDependencies.JUNIT_ARTIFACT_ID +
+                        ":" + AutoSerializableDependencies.VERSION);
     }
 }

@@ -19,7 +19,8 @@ public class NonPrivatePlugin implements Plugin {
     /**
      * Default constructor
      */
-    public NonPrivatePlugin() {}
+    public NonPrivatePlugin() {
+    }
 
     @Override
     public boolean matches(TypeDescription typeDefinitions) {

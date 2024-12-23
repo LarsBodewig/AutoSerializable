@@ -1,9 +1,9 @@
 pluginManagement {
-	rootProject.name = "$artifactId"
+    rootProject.name = "$artifactId"
 
-	repositories {
-		mavenLocal()
-		mavenCentral()
-		gradlePluginPortal()
-	}
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        gradlePluginPortal()
+    }
 }

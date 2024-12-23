@@ -2,7 +2,8 @@ package dev.bodewig.autoserializable.gradle.plugin;
 
 import dev.bodewig.autoserializable.NonPrivatePlugin;
 import net.bytebuddy.build.gradle.ByteBuddyJarsTask;
-import org.gradle.api.tasks.*;
+import org.gradle.api.tasks.CacheableTask;
+import org.gradle.api.tasks.Classpath;
 
 import java.io.File;
 
