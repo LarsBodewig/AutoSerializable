@@ -32,47 +32,24 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
 public class AutoSerializablePlugin extends NonPrivatePlugin implements Plugin.WithPreprocessor {
 
     private static final String FIELD_NAME = "_serializer";
-
     private static final Logger logger = Logger.getLogger(AutoSerializablePlugin.class.getCanonicalName());
-
     private static final Map<TypeDescription, TypeDescription> typeToSerializer = new HashMap<>();
-    private static final OneWayToggle classpathSearched = new OneWayToggle();
+    private static volatile boolean classpathSearched = false;
 
     /**
-     * Default constructor
+     * Initializes the plugin by searching the classpath elements for custom serializers.
+     *
+     * @param classpathElements The classpath configured in the byte-buddy plugin
      */
     public AutoSerializablePlugin(File[] classpathElements) {
         initialize(classpathElements);
     }
 
-    public void initialize(File[] classpathElements) {
-        if (!classpathSearched.get()) {
-            classpathSearched.toggle();
-            String classpath = Arrays.stream(classpathElements).map(File::toPath).map(Path::toString)
-                    .collect(Collectors.joining(File.pathSeparator));
-            logger.severe("initialize: Found " + classpathElements.length);
-            try (ScanResult result = new ClassGraph()
-                    .overrideClasspath(classpath)
-                    .enableAnnotationInfo()
-                    .scan()) {
-                List<TypeDescription> types =
-                        result.getClassesWithAnyAnnotation(AutoSerializableAll.class, AutoSerializable.class)
-                                .loadClasses()
-                                .stream()
-                                .map(TypeDescription.ForLoadedType::of)
-                                .toList();
-                types.forEach(System.out::println);
-                logger.severe("Found " + types.size() + " AutoSerializers");
-                for (TypeDescription type : types) {
-                    logger.severe("AddSerializer " + type.getName());
-                    addSerializer(type);
-                }
-            } catch (Exception e) {
-                logger.log(Level.SEVERE, "unable to load Lwjgl3ApplicationConfigurationSerializer", e);
-            }
-        }
-    }
-
+    /**
+     * Registers a custom serializer to use during transformation.
+     *
+     * @param typeDescription The custom serializer
+     */
     protected static void addSerializer(TypeDescription typeDescription) {
         AnnotationDescription.Loadable<AutoSerializable> annotation =
                 typeDescription.getDeclaredAnnotations().ofType(AutoSerializable.class);
@@ -85,6 +62,33 @@ public class AutoSerializablePlugin extends NonPrivatePlugin implements Plugin.W
         logger.severe("Registered custom serializer " + typeDescription.getCanonicalName() + " for " +
                 value.getCanonicalName());
         typeToSerializer.put(value, typeDescription);
+    }
+
+    /**
+     * Searches the classpath elements for custom serializers and registers them for use.
+     *
+     * @param classpathElements The classpath configured in the byte-buddy plugin
+     */
+    public void initialize(File[] classpathElements) {
+        if (!classpathSearched) {
+            classpathSearched = true;
+            String classpath = Arrays.stream(classpathElements).map(File::toPath).map(Path::toString)
+                    .collect(Collectors.joining(File.pathSeparator));
+            logger.severe("initialize: Found " + classpathElements.length);
+            try (ScanResult result = new ClassGraph().overrideClasspath(classpath).enableAnnotationInfo().scan()) {
+                List<TypeDescription> types =
+                        result.getClassesWithAnyAnnotation(AutoSerializableAll.class, AutoSerializable.class)
+                                .loadClasses().stream().map(TypeDescription.ForLoadedType::of).toList();
+                types.forEach(System.out::println);
+                logger.severe("Found " + types.size() + " AutoSerializers");
+                for (TypeDescription type : types) {
+                    logger.severe("AddSerializer " + type.getName());
+                    addSerializer(type);
+                }
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "unable to load Lwjgl3ApplicationConfigurationSerializer", e);
+            }
+        }
     }
 
     @Override

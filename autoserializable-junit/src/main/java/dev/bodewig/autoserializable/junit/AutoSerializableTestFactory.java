@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -32,8 +31,17 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class AutoSerializableTestFactory {
 
+    /**
+     * The classes found during object construction
+     */
     protected Set<Class<?>> classes;
+    /**
+     * The custom serializers found during object construction
+     */
     protected Set<Class<?>> serializers;
+    /**
+     * A stream of DynamicTests to run
+     */
     protected Stream<DynamicTest> tests;
 
     /**
@@ -63,6 +71,12 @@ public class AutoSerializableTestFactory {
         this.tests = tests;
     }
 
+    /**
+     * Generates a name using the supplied method name and tested type for dynamic tests.
+     *
+     * @param method The name of the tested method
+     * @return The generated name
+     */
     protected static Function<Class<?>, String> nameGenerator(String method) {
         return clazz -> method + "_" + clazz.getName().substring(clazz.getName().lastIndexOf('.') + 1);
     }
@@ -118,12 +132,24 @@ public class AutoSerializableTestFactory {
                                 Optional.ofNullable(clazz.getCanonicalName()).orElse("(anonymous class)")))));
     }
 
+    /**
+     * Finds all classes in a collection of classpath elements.
+     *
+     * @param uris The classpath elements to search
+     * @return The classes
+     */
     protected Set<Class<?>> findClasses(Collection<URI> uris) {
         return uris.stream()
                 .flatMap(uri -> ReflectionUtils.findAllClassesInClasspathRoot(uri, x -> true, x -> true).stream())
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * Finds the annotated custom serializers from a collection of classpath elements.
+     *
+     * @param uris The classpath elements to search
+     * @return The custom serializers
+     */
     protected Set<Class<?>> findSerializers(Collection<URI> uris) {
         return uris.stream().flatMap(uri -> ReflectionUtils.findAllClassesInClasspathRoot(uri, ClassFilter.of(
                 clazz -> clazz.isAnnotationPresent(AutoSerializable.class) ||
@@ -204,23 +230,22 @@ public class AutoSerializableTestFactory {
      * @return the factory instance
      */
     public AutoSerializableTestFactory testAutoSerializablesInitialized() {
-        return test(
-                classes.stream().filter(clazz ->
-                                !clazz.isAnnotation() && !clazz.isInterface() && !serializers.contains(clazz))
-                        .filter(clazz -> {
-                            try {
-                                clazz.getDeclaredField("_serializer");
-                            } catch (NoSuchFieldException e) {
-                                return false;
-                            }
-                            return true;
-                        }), "testAutoSerializablesInitialized", clazz -> {
-                    Field field = clazz.getDeclaredField("_serializer");
-                    field.setAccessible(true);
-                    assertNotNull(field.get(null), // null for static field
-                            "Generated constant '_serializer' of " + clazz.getCanonicalName() +
-                                    " was not initialized. The byte code is defect.");
-                });
+        return test(classes.stream()
+                .filter(clazz -> !clazz.isAnnotation() && !clazz.isInterface() && !serializers.contains(clazz))
+                .filter(clazz -> {
+                    try {
+                        clazz.getDeclaredField("_serializer");
+                    } catch (NoSuchFieldException e) {
+                        return false;
+                    }
+                    return true;
+                }), "testAutoSerializablesInitialized", clazz -> {
+            Field field = clazz.getDeclaredField("_serializer");
+            field.setAccessible(true);
+            assertNotNull(field.get(null), // null for static field
+                    "Generated constant '_serializer' of " + clazz.getCanonicalName() +
+                            " was not initialized. The byte code is defect.");
+        });
     }
 
     /**
@@ -231,8 +256,7 @@ public class AutoSerializableTestFactory {
      */
     public AutoSerializableTestFactory testAnnotatedAutoSerialized() {
         return test(classes.stream().filter(clazz -> !clazz.isAnnotation() && !serializers.contains(clazz)),
-                "testAnnotatedAutoSerialized",
-                clazz -> assertTrue(clazz.isAnnotationPresent(AutoSerialized.class),
+                "testAnnotatedAutoSerialized", clazz -> assertTrue(clazz.isAnnotationPresent(AutoSerialized.class),
                         "Type " + clazz.getCanonicalName() + " was not annotated with " +
                                 AutoSerialized.class.getCanonicalName()));
     }
