@@ -17,9 +17,9 @@ For gradle, however, there is a *autoserializable-gradle-plugin*, that preconfig
 
 ```groovy
 plugins {
-  id 'dev.bodewig.autoserializable.classes' version '2.0.1' 
+  id 'dev.bodewig.autoserializable.classes' version '2.0.2-SNAPSHOT' 
   // extends the ByteBuddySimpleTask to serialize local project java classes
-  id 'dev.bodewig.autoserializable.classes' version '2.0.1'
+  id 'dev.bodewig.autoserializable.classes' version '2.0.2-SNAPSHOT'
   // extends the ByteBuddyJarsTask to serialize dependencies of the autoSerializable configuration
 }
 
