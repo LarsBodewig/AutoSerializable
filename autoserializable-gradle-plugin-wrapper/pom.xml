@@ -12,7 +12,6 @@
 	</parent>
 	<artifactId>autoserializable-gradle-plugin-wrapper</artifactId>
 	<name>AutoSerializable gradle plugin wrapper</name>
-	<packaging>pom</packaging>
 
 	<properties>
 		<gradle-plugin-artifactId>autoserializable-gradle-plugin</gradle-plugin-artifactId>
@@ -27,6 +26,12 @@
 			<groupId>dev.gradleplugins</groupId>
 			<artifactId>gradle-api</artifactId>
 			<version>8.5</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>dev.bodewig.autoserializable</groupId>
+			<artifactId>autoserializable</artifactId>
+			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -50,6 +55,19 @@
 				<artifactId>exec-maven-plugin</artifactId>
 				<executions>
 					<execution>
+						<id>stop-clean-daemon</id>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<phase>pre-clean</phase>
+						<configuration>
+							<executable>../gradlew</executable>
+							<arguments>
+								<argument>--stop</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
 						<id>clean</id>
 						<goals>
 							<goal>exec</goal>
@@ -64,6 +82,19 @@
 									-PartifactId=${gradle-plugin-artifactId}</argument>
 								<argument>-Pversion=${project.version}</argument>
 								<argument>-PbyteBuddyVersion=${bytebuddy.version}</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>stop-build-daemon</id>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<phase>initialize</phase>
+						<configuration>
+							<executable>../gradlew</executable>
+							<arguments>
+								<argument>--stop</argument>
 							</arguments>
 						</configuration>
 					</execution>
@@ -115,6 +146,13 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
 				<configuration>
 					<skip>true</skip>
 				</configuration>

@@ -16,7 +16,13 @@ To use the plugin, you need to configure it with ByteBuddy. ByteBuddy offers plu
 mojos and tasks to transform class files or whole JARs.
 
 You can find examples for maven and gradle in the *autoserializable-test* project.
-For gradle, however, the most comfortable way is to create a precompiled plugin.
+For gradle, however, there is a combined *autoserializable-gradle-plugin*.
+
+```groovy
+plugins {
+  id "dev.bodewig.autoserializable" version "2.0.1-SNAPSHOT"
+}
+```
 
 ### Custom serializers
 

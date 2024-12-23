@@ -1,14 +1,31 @@
 plugins {
     id 'java-library'
-    id 'dev.bodewig.autoserializable' version "$version"
+    id 'dev.bodewig.autoserializable-jars' version "$version"
+    //id 'dev.bodewig.autoserializable-classes' version "$version"
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_19
+    sourceCompatibility = JavaVersion.VERSION_21
+}
+
+tasks.named('test', Test) {
+    useJUnitPlatform()
+    testLogging {
+        events 'failed', 'skipped', 'passed'
+    }
 }
 
 dependencies {
-    autoSerializable "com.badlogicgames.gdx:gdx:1.12.1"
+    autoSerializable 'com.badlogicgames.gdx:gdx:1.12.1'
+    testImplementation 'io.github.classgraph:classgraph:4.8.174'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.4'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    gradlePluginPortal()
 }
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'

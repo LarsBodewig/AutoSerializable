@@ -1,6 +1,7 @@
 package dev.bodewig.autoserializable.gradle.plugin;
 
 import org.gradle.api.Action;
+import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
@@ -14,7 +15,7 @@ import org.gradle.api.tasks.compile.JavaCompile;
 
 import java.io.File;
 
-public class AutoSerializableGradlePlugin implements Plugin<Project> {
+public class AutoSerializableJarsGradlePlugin implements Plugin<Project> {
 
     public static final String AUTO_SERIALIZABLE_CONFIGURATION_NAME = "autoSerializable";
     public static final String NON_PRIVATE_CONFIGURATION_NAME = "nonPrivateConfig";
@@ -31,7 +32,8 @@ public class AutoSerializableGradlePlugin implements Plugin<Project> {
         project.getPlugins().apply(JavaPlugin.class);
 
         // create configuration to register dependencies to transform
-        Configuration autoSerializableConfig = project.getConfigurations().create(AUTO_SERIALIZABLE_CONFIGURATION_NAME);
+        NamedDomainObjectProvider<Configuration> autoSerializableConfig =
+                project.getConfigurations().register(AUTO_SERIALIZABLE_CONFIGURATION_NAME);
 
         // create task to download registered dependencies
         TaskProvider<PullJarsTask> pullJarsTask =
@@ -43,22 +45,23 @@ public class AutoSerializableGradlePlugin implements Plugin<Project> {
         TaskProvider<NonPrivateTask> nonPrivateTask =
                 project.getTasks().register(NonPrivateTask.TASK_NAME, NonPrivateTask.class, task -> {
                     task.setSource(pullJarsTask.map(PullJarsTask::getPulledDir).get().get().getAsFile());
-                    task.setClassPath(autoSerializableConfig);
+                    task.setClassPath(autoSerializableConfig.get());
                     task.dependsOn(pullJarsTask);
                 });
 
         // add nonprivate jars to compile configuration
-        Configuration nonPrivateConfig = project.getConfigurations().create(NON_PRIVATE_CONFIGURATION_NAME, config -> {
-            config.defaultDependencies(dependencies -> {
-                Provider<File> nonPrivateOutput = nonPrivateTask.map(NonPrivateTask::getTarget);
-                Dependency nonPrivateJars =
-                        project.getDependencies().create(project.fileTree(nonPrivateOutput, jarFilter()));
-                dependencies.add(nonPrivateJars);
-            });
-        });
+        NamedDomainObjectProvider<Configuration> nonPrivateConfig =
+                project.getConfigurations().register(NON_PRIVATE_CONFIGURATION_NAME, config -> {
+                    config.defaultDependencies(dependencies -> {
+                        Provider<File> nonPrivateOutput = nonPrivateTask.map(NonPrivateTask::getTarget);
+                        Dependency nonPrivateJars =
+                                project.getDependencies().create(project.fileTree(nonPrivateOutput, jarFilter()));
+                        dependencies.add(nonPrivateJars);
+                    });
+                });
         Configuration compileClasspathConfig =
                 project.getConfigurations().getByName(JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME);
-        compileClasspathConfig.extendsFrom(nonPrivateConfig);
+        compileClasspathConfig.extendsFrom(nonPrivateConfig.get());
 
         // run non private task before compiling
         TaskProvider<JavaCompile> compileTask =
@@ -74,73 +77,68 @@ public class AutoSerializableGradlePlugin implements Plugin<Project> {
                 });
 
         // create configuration with compiled classes and non private libs to find serializers
-        Configuration serializersConfig = project.getConfigurations().create(SERIALIZERS_CONFIGURATION_NAME, config -> {
-            config.defaultDependencies(dependencies -> {
-                DirectoryProperty preAssembleJarOutput = preAssembleJarTask.get().getDestinationDirectory();
-                Dependency compiledClasses =
-                        project.getDependencies().create(project.fileTree(preAssembleJarOutput, jarFilter()));
-                dependencies.add(compiledClasses);
+        NamedDomainObjectProvider<Configuration> serializersConfig =
+                project.getConfigurations().register(SERIALIZERS_CONFIGURATION_NAME, config -> {
+                    config.defaultDependencies(dependencies -> {
+                        DirectoryProperty preAssembleJarOutput = preAssembleJarTask.get().getDestinationDirectory();
+                        Dependency compiledClasses =
+                                project.getDependencies().create(project.fileTree(preAssembleJarOutput, jarFilter()));
+                        dependencies.add(compiledClasses);
 
-                dependencies.add(AutoSerializableDependencies.autoserializableApi(project));
-            });
-            config.extendsFrom(compileClasspathConfig);
-        });
+                        dependencies.add(AutoSerializableDependencies.autoserializableApi(project));
+                    });
+                    config.extendsFrom(compileClasspathConfig);
+                });
 
         // create task to make downloaded dependencies serializable
         TaskProvider<AutoSerializableJarsTask> autoSerializableJarsTask = project.getTasks()
                 .register(AutoSerializableJarsTask.TASK_NAME, AutoSerializableJarsTask.class, task -> {
                     task.setSource(pullJarsTask.map(PullJarsTask::getPulledDir).get().get().getAsFile());
-                    task.setClassPath(serializersConfig);
+                    task.setClassPath(serializersConfig.get());
                     task.dependsOn(preAssembleJarTask);
-                });
-        TaskProvider<AutoSerializableClassesTask> autoSerializableClassesTask = project.getTasks()
-                .register(AutoSerializableClassesTask.TASK_NAME, AutoSerializableClassesTask.class, task -> {
-                    task.setInPlace(compileTask.get().getDestinationDirectory());
-                    task.setClassPath(serializersConfig);
-                    task.dependsOn(autoSerializableJarsTask);
                 });
 
         // add autoserializable jars and the autoserializable-api to api configuration
-        Configuration apiConfig = project.getConfigurations().create(API_DEPENDENCIES_CONFIGURATION_NAME, config -> {
-            config.defaultDependencies(dependencies -> {
-                Dependency autoserializableApi = AutoSerializableDependencies.autoserializableApi(project);
-                dependencies.add(autoserializableApi);
+        NamedDomainObjectProvider<Configuration> apiConfig =
+                project.getConfigurations().register(API_DEPENDENCIES_CONFIGURATION_NAME, config -> {
+                    config.defaultDependencies(dependencies -> {
+                        Dependency autoserializableApi = AutoSerializableDependencies.autoserializableApi(project);
+                        dependencies.add(autoserializableApi);
 
-                Provider<File> autoSerializableOutput =
-                        autoSerializableJarsTask.map(AutoSerializableJarsTask::getTarget);
-                Dependency transformedDir =
-                        project.getDependencies().create(project.fileTree(autoSerializableOutput, jarFilter()));
-                dependencies.add(transformedDir);
-            });
-        });
+                        Provider<File> autoSerializableOutput =
+                                autoSerializableJarsTask.map(AutoSerializableJarsTask::getTarget);
+                        Dependency transformedDir =
+                                project.getDependencies().create(project.fileTree(autoSerializableOutput, jarFilter()));
+                        dependencies.add(transformedDir);
+                    });
+                });
         project.getConfigurations().getByName(JavaPlugin.API_CONFIGURATION_NAME, config -> {
-            config.extendsFrom(apiConfig);
+            config.extendsFrom(apiConfig.get());
         });
 
         // add autoserializable jars and autoserializable-junit to test configuration
-        Configuration testConfig = project.getConfigurations().create(TEST_CONFIGURATION_NAME, config -> {
-            config.defaultDependencies(dependencies -> {
-                dependencies.add(AutoSerializableDependencies.autoserializableJunit(project));
+        NamedDomainObjectProvider<Configuration> testConfig =
+                project.getConfigurations().register(TEST_CONFIGURATION_NAME, config -> {
+                    config.defaultDependencies(dependencies -> {
+                        dependencies.add(AutoSerializableDependencies.autoserializableJunit(project));
 
-                Provider<File> autoSerializableOutput =
-                        autoSerializableJarsTask.map(AutoSerializableJarsTask::getTarget);
-                Dependency transformedDir =
-                        project.getDependencies().create(project.fileTree(autoSerializableOutput, jarFilter()));
-                dependencies.add(transformedDir);
-            });
-        });
+                        Provider<File> autoSerializableOutput =
+                                autoSerializableJarsTask.map(AutoSerializableJarsTask::getTarget);
+                        Dependency transformedDir =
+                                project.getDependencies().create(project.fileTree(autoSerializableOutput, jarFilter()));
+                        dependencies.add(transformedDir);
+                    });
+                });
         project.getConfigurations().getByName(JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME, config -> {
-            config.extendsFrom(testConfig);
+            config.extendsFrom(testConfig.get());
         });
 
         // run autoserializable task before compiling tests
         project.getTasks().named(JavaPlugin.COMPILE_TEST_JAVA_TASK_NAME).configure(task -> {
             task.dependsOn(autoSerializableJarsTask);
-            task.dependsOn(autoSerializableClassesTask);
         });
         project.getTasks().named(JavaPlugin.CLASSES_TASK_NAME).configure(task -> {
             task.dependsOn(autoSerializableJarsTask);
-            task.dependsOn(autoSerializableClassesTask);
         });
     }
 }

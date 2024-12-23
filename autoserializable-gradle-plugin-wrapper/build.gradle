@@ -20,17 +20,22 @@ dependencies {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_19
-    withJavadocJar()
+    sourceCompatibility = JavaVersion.VERSION_21
+    //withJavadocJar()
     withSourcesJar()
 }
 
 gradlePlugin {
     plugins {
-        compilefromsource {
-            id = 'dev.bodewig.autoserializable'
+        autoserializable {
+            id = 'dev.bodewig.autoserializable-classes'
             tags.set(['dependencies', 'configuration', 'build', 'java'])
-            implementationClass = 'dev.bodewig.autoserializable.gradle.plugin.AutoSerializableGradlePlugin'
+            implementationClass = 'dev.bodewig.autoserializable.gradle.plugin.AutoSerializableClassesGradlePlugin'
+        }
+        autoserializable2 {
+            id = 'dev.bodewig.autoserializable-jars'
+            tags.set(['dependencies', 'configuration', 'build', 'java'])
+            implementationClass = 'dev.bodewig.autoserializable.gradle.plugin.AutoSerializableJarsGradlePlugin'
         }
     }
 }
