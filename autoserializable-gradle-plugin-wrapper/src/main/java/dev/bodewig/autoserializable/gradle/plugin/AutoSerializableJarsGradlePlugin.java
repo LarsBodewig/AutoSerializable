@@ -98,7 +98,7 @@ public class AutoSerializableJarsGradlePlugin implements Plugin<Project> {
         // create jar from compiled classes to reference on autoSerializable classpath
         TaskProvider<PreAssembleJarTask> preAssembleJarTask =
                 project.getTasks().register(PreAssembleJarTask.TASK_NAME, PreAssembleJarTask.class, task -> {
-                    task.getClassFiles().set(compileTask.get().getDestinationDirectory());
+                    task.setClassFiles(compileTask.get().getDestinationDirectory());
                     task.dependsOn(compileTask);
                 });
 
