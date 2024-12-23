@@ -16,6 +16,11 @@ import static net.bytebuddy.matcher.ElementMatchers.isPrivate;
  */
 public class NonPrivatePlugin implements Plugin {
 
+    /**
+     * Default constructor
+     */
+    public NonPrivatePlugin() {}
+
     @Override
     public boolean matches(TypeDescription typeDefinitions) {
         return typeDefinitions != null;
