@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
     id 'dev.bodewig.autoserializable-jars' version "$version"
-    //id 'dev.bodewig.autoserializable-classes' version "$version"
+    id 'dev.bodewig.autoserializable-classes' version "$version"
 }
 
 java {

@@ -15,17 +15,45 @@ import org.gradle.api.tasks.compile.JavaCompile;
 
 import java.io.File;
 
+/**
+ * Gradle plugin that invokes the custom byte-buddy plugin AutoSerializable on jars
+ */
 public class AutoSerializableJarsGradlePlugin implements Plugin<Project> {
 
+    /**
+     * The name of the configuration used for jars to transform with byte-buddy
+     */
     public static final String AUTO_SERIALIZABLE_CONFIGURATION_NAME = "autoSerializable";
+    /**
+     * The name of the configuration used for custom serializer compilation
+     */
     public static final String NON_PRIVATE_CONFIGURATION_NAME = "nonPrivateConfig";
+    /**
+     * The name of the configuration used as classpath for the byte-buddy gradle plugin
+     */
     public static final String SERIALIZERS_CONFIGURATION_NAME = "autoSerializers";
+    /**
+     * The name of the configuration used to add api dependencies
+     */
     public static final String API_DEPENDENCIES_CONFIGURATION_NAME = "autoserializableDeps";
+    /**
+     * The name of the configuration used to add test dependencies
+     */
     public static final String TEST_CONFIGURATION_NAME = "autoSerializableTest";
 
+    /**
+     * Creates a filter on a ConfigurableFileTree for jar files
+     *
+     * @return The filter
+     */
     public static Action<? super ConfigurableFileTree> jarFilter() {
         return files -> files.include("*.jar");
     }
+
+    /**
+     * Default constructor
+     */
+    public AutoSerializableJarsGradlePlugin() {}
 
     @Override
     public void apply(Project project) {

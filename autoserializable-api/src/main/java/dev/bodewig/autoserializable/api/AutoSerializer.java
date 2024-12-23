@@ -39,6 +39,11 @@ public interface AutoSerializer<T> {
      */
     class DefaultSerializer implements AutoSerializer<Object> {
 
+        /**
+         * Default constructor
+         */
+        public DefaultSerializer() {}
+
         @Override
         public void writeObject(ObjectOutputStream out, Object that) throws IOException {
             out.defaultWriteObject();

@@ -8,10 +8,24 @@ import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.compile.JavaCompile;
 
+/**
+ * Gradle plugin that invokes the custom byte-buddy plugin AutoSerializable on compiled classes
+ */
 public class AutoSerializableClassesGradlePlugin implements Plugin<Project> {
 
+    /**
+     * The name of the configuration used as classpath for the byte-buddy gradle plugin
+     */
     public static final String SERIALIZERS_CONFIGURATION_NAME = "autoSerializers";
+    /**
+     * The name of the configuration used to add test dependencies
+     */
     public static final String TEST_CONFIGURATION_NAME = "autoSerializableTest";
+
+    /**
+     * Default constructor
+     */
+    public AutoSerializableClassesGradlePlugin() {}
 
     @Override
     public void apply(Project project) {
