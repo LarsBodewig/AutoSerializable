@@ -16,9 +16,14 @@
 	<properties>
 		<gradle-plugin-artifactId>autoserializable-gradle-plugin</gradle-plugin-artifactId>
 		<gradle-plugin-name>${gradle-plugin-artifactId}-${project.version}</gradle-plugin-name>
-		<gradle-plugin-marker-artifactId>dev.bodewig.autoserializable.gradle.plugin</gradle-plugin-marker-artifactId>
-		<gradle-plugin-marker-name>
-			${gradle-plugin-marker-artifactId}-${project.version}</gradle-plugin-marker-name>
+		<gradle-plugin-marker-suffix-1>-classes</gradle-plugin-marker-suffix-1>
+		<gradle-plugin-marker-artifactId-1>dev.bodewig.autoserializable${gradle-plugin-marker-suffix-1}.gradle.plugin</gradle-plugin-marker-artifactId-1>
+		<gradle-plugin-marker-name-1>
+			${gradle-plugin-marker-artifactId-1}-${project.version}</gradle-plugin-marker-name-1>
+		<gradle-plugin-marker-suffix-2>-jars</gradle-plugin-marker-suffix-2>
+		<gradle-plugin-marker-artifactId-2>dev.bodewig.autoserializable${gradle-plugin-marker-suffix-2}.gradle.plugin</gradle-plugin-marker-artifactId-2>
+		<gradle-plugin-marker-name-2>
+			${gradle-plugin-marker-artifactId-2}-${project.version}</gradle-plugin-marker-name-2>
 	</properties>
 
 	<dependencies>
@@ -230,9 +235,16 @@
 								<configuration>
 									<artifactItems>
 										<artifactItem>
-											<groupId>${project.groupId}</groupId>
+											<groupId>${project.groupId}${gradle-plugin-marker-suffix-1}</groupId>
 											<artifactId>
-												${gradle-plugin-marker-artifactId}</artifactId>
+												${gradle-plugin-marker-artifactId-1}</artifactId>
+											<version>${project.version}</version>
+											<type>pom</type>
+										</artifactItem>
+										<artifactItem>
+											<groupId>${project.groupId}${gradle-plugin-marker-suffix-2}</groupId>
+											<artifactId>
+												${gradle-plugin-marker-artifactId-2}</artifactId>
 											<version>${project.version}</version>
 											<type>pom</type>
 										</artifactItem>
@@ -273,16 +285,34 @@
 								</configuration>
 							</execution>
 							<execution>
-								<id>sign-gradle-plugin-marker</id>
+								<id>sign-gradle-plugin-marker-1</id>
 								<goals>
 									<goal>sign-and-deploy-file</goal>
 								</goals>
 								<phase>deploy</phase>
 								<configuration>
 									<file>
-										${project.build.directory}/dependency/${gradle-plugin-marker-name}.pom</file>
+										${project.build.directory}/dependency/${gradle-plugin-marker-name-1}.pom</file>
 									<pomFile>
-										${project.build.directory}/dependency/${gradle-plugin-marker-name}.pom</pomFile>
+										${project.build.directory}/dependency/${gradle-plugin-marker-name-1}.pom</pomFile>
+									<packaging>pom</packaging>
+									<repositoryId>
+										${project.distributionManagement.repository.id}</repositoryId>
+									<url>
+										${project.distributionManagement.repository.url}</url>
+								</configuration>
+							</execution>
+							<execution>
+								<id>sign-gradle-plugin-marker-2</id>
+								<goals>
+									<goal>sign-and-deploy-file</goal>
+								</goals>
+								<phase>deploy</phase>
+								<configuration>
+									<file>
+										${project.build.directory}/dependency/${gradle-plugin-marker-name-2}.pom</file>
+									<pomFile>
+										${project.build.directory}/dependency/${gradle-plugin-marker-name-2}.pom</pomFile>
 									<packaging>pom</packaging>
 									<repositoryId>
 										${project.distributionManagement.repository.id}</repositoryId>
