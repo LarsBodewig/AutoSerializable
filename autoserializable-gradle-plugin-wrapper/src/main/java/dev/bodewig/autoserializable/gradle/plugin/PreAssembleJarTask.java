@@ -22,25 +22,34 @@ public class PreAssembleJarTask extends Jar {
      */
     public static final String PRE_ASSEMBLE_JAR_DIR_NAME = "preAssembleJar";
 
-    private final DirectoryProperty classFiles;
+    private Provider<Directory> classFiles;
 
     /**
-     * Initializes the output directory with the default value and sets a dummy value for the classFiles
+     * Initializes the output directory with the default value
      */
     public PreAssembleJarTask() {
-        classFiles = getProject().getObjects().directoryProperty();
         setDestinationDirectory(getProject().getLayout().getBuildDirectory().dir(PRE_ASSEMBLE_JAR_DIR_NAME));
     }
 
     /**
-     * Get or set the directory of compiled classes to assemble in a jar
+     * Gets the directory of compiled classes to assemble in a jar
      *
-     * @return The classFiles DirectoryProperty
+     * @return The classFiles
      */
     @InputDirectory
     @PathSensitive(PathSensitivity.RELATIVE)
-    public DirectoryProperty getClassFiles() {
+    public Provider<Directory> getClassFiles() {
         return classFiles;
+    }
+
+    /**
+     * Sets the directory of compiled classes to assemble in a jar
+     *
+     * @param classFiles The classFiles directory
+     */
+    public void setClassFiles(Provider<Directory> classFiles) {
+        this.classFiles = classFiles;
+        from(classFiles);
     }
 
     @Override

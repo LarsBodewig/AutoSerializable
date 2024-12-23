@@ -55,7 +55,7 @@ public class AutoSerializableClassesGradlePlugin implements Plugin<Project> {
         // create jar from compiled classes to reference on autoSerializable classpath
         PreAssembleJarTask preAssembleJarTask =
                 project.getTasks().maybeCreate(PreAssembleJarTask.TASK_NAME, PreAssembleJarTask.class);
-        preAssembleJarTask.getClassFiles().set(compileTask.get().getDestinationDirectory());
+        preAssembleJarTask.setClassFiles(compileTask.get().getDestinationDirectory());
         preAssembleJarTask.dependsOn(compileTask);
 
         // create configuration with compiled classes and non private libs to find serializers
@@ -97,7 +97,6 @@ public class AutoSerializableClassesGradlePlugin implements Plugin<Project> {
         testConfig.defaultDependencies(dependencies -> {
             dependencies.add(AutoSerializableDependencies.autoserializableJunit(project));
         });
-
         project.getConfigurations().getByName(JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME, config -> {
             config.extendsFrom(testConfig);
         });
