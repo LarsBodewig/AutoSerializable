@@ -44,6 +44,7 @@ public class AutoSerializableClassesTask extends ByteBuddySimpleTask {
 
     /**
      * Getter for inPlace
+     *
      * @return inPlace
      */
     @InputDirectory
@@ -54,6 +55,7 @@ public class AutoSerializableClassesTask extends ByteBuddySimpleTask {
 
     /**
      * Sets the source and target directory for the byte-buddy transformation
+     *
      * @param inPlace The directory containing the compiled classes
      */
     public void setInPlace(Provider<Directory> inPlace) {

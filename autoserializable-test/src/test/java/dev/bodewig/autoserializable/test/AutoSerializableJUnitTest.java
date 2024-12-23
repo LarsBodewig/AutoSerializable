@@ -15,12 +15,9 @@ class AutoSerializableJUnitTest {
     @TestFactory
     Stream<DynamicTest> testAll() {
         List<URI> sources;
-        try (ScanResult scanResult = new ClassGraph().ignoreClassVisibility()
-                .filterClasspathElements(
-                        path -> path.endsWith("/autoserializable-test/target/classes")
-                            || path.endsWith("/build/classes/java/main")
-                            || path.contains("/build/transformedJars"))
-                .scan()) {
+        try (ScanResult scanResult = new ClassGraph().ignoreClassVisibility().filterClasspathElements(
+                path -> path.endsWith("/autoserializable-test/target/classes") ||
+                        path.endsWith("/build/classes/java/main") || path.contains("/build/transformedJars")).scan()) {
             sources = scanResult.getClasspathURIs();
         }
         return new AutoSerializableTestFactory(sources).testAllClassesImplementSerializable().testSerializersAnnotated()
