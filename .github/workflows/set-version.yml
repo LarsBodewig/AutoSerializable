@@ -25,7 +25,7 @@ jobs:
       uses: actions/setup-java@v4
       with:
         distribution: 'oracle'
-        java-version: '17'
+        java-version: '21'
     - name: Evaluate old version
       run: |
         echo "oldVersion=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)" >> "$GITHUB_ENV"
@@ -53,7 +53,12 @@ jobs:
         files: 'README.md'
         search-text: '${{ env.oldVersion }}'
         replacement-text: '${{ env.newVersion }}'
-        encoding: 'utf8'
+    - name: Update version in gradle plugin
+      uses: richardrigutins/replace-in-files@v2
+      with:
+        files: 'autoserializable-gradle-plugin-wrapper/src/**/AutoSerializableDependencies.java'
+        search-text: '${{ env.oldVersion }}'
+        replacement-text: '${{ env.newVersion }}'
     - name: Commit changes
       run: |
         git config user.name "github-actions[bot]"

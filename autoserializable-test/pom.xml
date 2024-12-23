@@ -20,6 +20,12 @@
         </dependency>
         <dependency>
             <groupId>dev.bodewig.autoserializable</groupId>
+            <artifactId>autoserializable-junit</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>dev.bodewig.autoserializable</groupId>
             <artifactId>autoserializable-gradle-plugin-wrapper</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
@@ -170,6 +176,19 @@
                         <artifactId>exec-maven-plugin</artifactId>
                         <executions>
                             <execution>
+                                <id>stop-clean-daemon</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>pre-clean</phase>
+                                <configuration>
+                                    <executable>../gradlew</executable>
+                                    <arguments>
+                                        <argument>--stop</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
                                 <id>gradle-clean</id>
                                 <goals>
                                     <goal>exec</goal>
@@ -181,6 +200,19 @@
                                         <argument>clean</argument>
                                         <argument>-Pversion=${project.version}</argument>
                                         <argument>--stacktrace</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>stop-build-daemon</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>initialize</phase>
+                                <configuration>
+                                    <executable>../gradlew</executable>
+                                    <arguments>
+                                        <argument>--stop</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
