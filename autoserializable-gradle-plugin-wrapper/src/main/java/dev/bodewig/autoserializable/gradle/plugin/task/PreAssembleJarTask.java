@@ -1,4 +1,4 @@
-package dev.bodewig.autoserializable.gradle.plugin;
+package dev.bodewig.autoserializable.gradle.plugin.task;
 
 import org.gradle.api.file.Directory;
 import org.gradle.api.file.DirectoryProperty;
