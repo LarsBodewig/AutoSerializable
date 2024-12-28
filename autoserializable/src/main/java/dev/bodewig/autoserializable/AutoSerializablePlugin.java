@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -59,8 +58,7 @@ public class AutoSerializablePlugin extends NonPrivatePlugin implements Plugin.W
                             " but is missing an " + AutoSerializable.class.getName() + " annotation");
         }
         TypeDescription value = annotation.getValue("value").resolve(TypeDescription.class);
-        logger.severe("Registered custom serializer " + typeDescription.getCanonicalName() + " for " +
-                value.getCanonicalName());
+        logger.info("Registered custom serializer " + typeDescription.getName() + " for " + value.getName());
         typeToSerializer.put(value, typeDescription);
     }
 
@@ -74,19 +72,14 @@ public class AutoSerializablePlugin extends NonPrivatePlugin implements Plugin.W
             classpathSearched = true;
             String classpath = Arrays.stream(classpathElements).map(File::toPath).map(Path::toString)
                     .collect(Collectors.joining(File.pathSeparator));
-            logger.severe("initialize: Found " + classpathElements.length);
+            logger.info("Scanning classpath for custom serializers");
+            logger.fine("Classpath elements: " + Arrays.toString(classpathElements));
             try (ScanResult result = new ClassGraph().overrideClasspath(classpath).enableAnnotationInfo().scan()) {
                 List<TypeDescription> types =
                         result.getClassesWithAnyAnnotation(AutoSerializableAll.class, AutoSerializable.class)
                                 .loadClasses().stream().map(TypeDescription.ForLoadedType::of).toList();
-                types.forEach(System.out::println);
-                logger.severe("Found " + types.size() + " AutoSerializers");
-                for (TypeDescription type : types) {
-                    logger.severe("AddSerializer " + type.getName());
-                    addSerializer(type);
-                }
-            } catch (Exception e) {
-                logger.log(Level.SEVERE, "unable to load Lwjgl3ApplicationConfigurationSerializer", e);
+                logger.info("Found " + types.size() + " custom serializers on classpath");
+                types.forEach(AutoSerializablePlugin::addSerializer);
             }
         }
     }
@@ -137,8 +130,7 @@ public class AutoSerializablePlugin extends NonPrivatePlugin implements Plugin.W
         TypeDescription serializer = TypeDescription.ForLoadedType.of(AutoSerializer.class);
         if (typeToSerializer.containsKey(typeDescription)) {
             serializer = typeToSerializer.get(typeDescription);
-            logger.severe("Binding custom serializer " + serializer.getCanonicalName() + " to " +
-                    typeDescription.getCanonicalName());
+            logger.info("Injected custom serializer " + serializer.getName() + " into " + typeDescription.getName());
         }
 
         // private static final AutoSerializer _serializer;
