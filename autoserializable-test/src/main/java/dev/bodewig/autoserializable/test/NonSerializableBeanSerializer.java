@@ -7,7 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 @AutoSerializable(NonSerializableBean.class)
-public class NonSerializableBeanSerializer implements AutoSerializer<NonSerializableBean> {
+public class NonSerializableBeanSerializer extends AutoSerializer<NonSerializableBean> {
 
     @Override
     public void writeObject(ObjectOutputStream out, NonSerializableBean that) {

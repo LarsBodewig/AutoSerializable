@@ -8,8 +8,8 @@ import java.lang.annotation.*;
  * AutoSerializers can be used to customize the serialization and deserialization methods injected in the {@code
  * AutoSerializablePlugin}.
  * <p>
- * AutoSerializer implementations have to implement the {@link AutoSerializer} interface and specify the
- * {@link AutoSerializable} annotation.
+ * AutoSerializer implementations have to extend {@link AutoSerializer} and specify the {@link AutoSerializable}
+ * annotation.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
