@@ -16,9 +16,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,15 +32,15 @@ public class AutoSerializableTestFactory {
     /**
      * The classes found during object construction
      */
-    protected Set<Class<?>> classes;
+    protected List<Class<?>> classes;
     /**
      * The custom serializers found during object construction
      */
-    protected Set<Class<?>> serializers;
+    protected List<Class<?>> serializers;
     /**
      * A stream of DynamicTests to run
      */
-    protected Stream<DynamicTest> tests;
+    protected List<DynamicTest> tests;
 
     /**
      * Creates a new factory instance with the given {@link URI}s
@@ -61,11 +59,11 @@ public class AutoSerializableTestFactory {
     public AutoSerializableTestFactory(Collection<URI> sources) {
         classes = findClasses(sources);
         serializers = findSerializers(sources);
-        tests = Stream.empty();
+        tests = List.of();
     }
 
     // copy constructor
-    private AutoSerializableTestFactory(Set<Class<?>> classes, Set<Class<?>> serializers, Stream<DynamicTest> tests) {
+    private AutoSerializableTestFactory(List<Class<?>> classes, List<Class<?>> serializers, List<DynamicTest> tests) {
         this.classes = classes;
         this.serializers = serializers;
         this.tests = tests;
@@ -126,10 +124,10 @@ public class AutoSerializableTestFactory {
 
     private AutoSerializableTestFactory test(Stream<Class<?>> inputStream, String testName,
                                              ThrowingConsumer<Class<?>> testExecutor) {
-        return new AutoSerializableTestFactory(classes, serializers, Stream.concat(tests,
+        return new AutoSerializableTestFactory(classes, serializers, Stream.concat(tests.stream(),
                 DynamicTest.stream(inputStream, nameGenerator(testName),
                         clazz -> assertDoesNotThrow(() -> testExecutor.accept(clazz), testName + " failed on " +
-                                Optional.ofNullable(clazz.getCanonicalName()).orElse("(anonymous class)")))));
+                                Optional.ofNullable(clazz.getCanonicalName()).orElse("(anonymous class)")))).toList());
     }
 
     /**
@@ -138,10 +136,10 @@ public class AutoSerializableTestFactory {
      * @param uris The classpath elements to search
      * @return The classes
      */
-    protected Set<Class<?>> findClasses(Collection<URI> uris) {
+    protected List<Class<?>> findClasses(Collection<URI> uris) {
         return uris.stream()
                 .flatMap(uri -> ReflectionUtils.findAllClassesInClasspathRoot(uri, x -> true, x -> true).stream())
-                .collect(Collectors.toSet());
+                .distinct().toList();
     }
 
     /**
@@ -150,11 +148,11 @@ public class AutoSerializableTestFactory {
      * @param uris The classpath elements to search
      * @return The custom serializers
      */
-    protected Set<Class<?>> findSerializers(Collection<URI> uris) {
+    protected List<Class<?>> findSerializers(Collection<URI> uris) {
         return uris.stream().flatMap(uri -> ReflectionUtils.findAllClassesInClasspathRoot(uri, ClassFilter.of(
                 clazz -> clazz.isAnnotationPresent(AutoSerializable.class) ||
                         clazz.isAnnotationPresent(AutoSerializableAll.class) ||
-                        AutoSerializer.class.isAssignableFrom(clazz))).stream()).collect(Collectors.toSet());
+                        AutoSerializer.class.isAssignableFrom(clazz))).stream()).distinct().toList();
     }
 
     /**
@@ -165,7 +163,7 @@ public class AutoSerializableTestFactory {
      * @return the stream containing the {@link DynamicTest}s
      */
     public Stream<DynamicTest> build() {
-        return tests;
+        return tests.stream();
     }
 
     /**
