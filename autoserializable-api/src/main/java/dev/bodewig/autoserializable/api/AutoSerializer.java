@@ -8,12 +8,18 @@ import java.io.ObjectOutputStream;
  * AutoSerializers can be used to customize the serialization and deserialization methods injected in the {@code
  * AutoSerializablePlugin}.
  * <p>
- * AutoSerializer implementations have to implement the {@link AutoSerializer} interface and specify the
- * {@link AutoSerializable} annotation.
+ * Custom implementations have to extend this default implementation of {@code Serializable} and specify the {@link
+ * AutoSerializable} annotation.
  *
  * @param <T> the type to serialize and deserialize
  */
-public interface AutoSerializer<T> {
+public class AutoSerializer<T> {
+
+    /**
+     * Default constructor
+     */
+    public AutoSerializer() {
+    }
 
     /**
      * The custom serializer injected by the {@code AutoSerializablePlugin}
@@ -22,7 +28,9 @@ public interface AutoSerializer<T> {
      * @param that the object to serialize
      * @throws IOException if I/O errors occur while writing to the underlying {@link java.io.OutputStream}
      */
-    void writeObject(ObjectOutputStream out, T that) throws IOException;
+    public void writeObject(ObjectOutputStream out, T that) throws IOException {
+        out.defaultWriteObject();
+    }
 
     /**
      * The custom deserializer injected by the {@code AutoSerializablePlugin}
@@ -32,27 +40,7 @@ public interface AutoSerializer<T> {
      * @throws IOException            if an I/O error occurs
      * @throws ClassNotFoundException if the class of a serialized object could not be found
      */
-    void readObject(ObjectInputStream in, T that) throws IOException, ClassNotFoundException;
-
-    /**
-     * The default implementation used by the {@code AutoSerializablePlugin} if no {@code AutoSerializer} was injected.
-     */
-    class DefaultSerializer implements AutoSerializer<Object> {
-
-        /**
-         * Default constructor
-         */
-        public DefaultSerializer() {
-        }
-
-        @Override
-        public void writeObject(ObjectOutputStream out, Object that) throws IOException {
-            out.defaultWriteObject();
-        }
-
-        @Override
-        public void readObject(ObjectInputStream in, Object that) throws IOException, ClassNotFoundException {
-            in.defaultReadObject();
-        }
+    public void readObject(ObjectInputStream in, T that) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
     }
 }

@@ -134,7 +134,7 @@ public class AutoSerializablePlugin extends NonPrivatePlugin implements Plugin.W
         }
 
         // find annotated AutoSerializer or use DefaultSerializer
-        TypeDescription serializer = TypeDescription.ForLoadedType.of(AutoSerializer.DefaultSerializer.class);
+        TypeDescription serializer = TypeDescription.ForLoadedType.of(AutoSerializer.class);
         if (typeToSerializer.containsKey(typeDescription)) {
             serializer = typeToSerializer.get(typeDescription);
             logger.severe("Binding custom serializer " + serializer.getCanonicalName() + " to " +
