@@ -1,5 +1,8 @@
 package dev.bodewig.autoserializable.gradle.plugin;
 
+import dev.bodewig.autoserializable.gradle.plugin.task.AutoSerializableClassesTask;
+import dev.bodewig.autoserializable.gradle.plugin.task.AutoSerializableJarsTask;
+import dev.bodewig.autoserializable.gradle.plugin.task.PreAssembleJarTask;
 import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;

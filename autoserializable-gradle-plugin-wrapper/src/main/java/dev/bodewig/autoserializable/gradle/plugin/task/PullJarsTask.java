@@ -1,4 +1,4 @@
-package dev.bodewig.autoserializable.gradle.plugin;
+package dev.bodewig.autoserializable.gradle.plugin.task;
 
 import org.gradle.api.NamedDomainObjectProvider;
 import org.gradle.api.artifacts.Configuration;

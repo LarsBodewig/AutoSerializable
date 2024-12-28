@@ -1,4 +1,4 @@
-package dev.bodewig.autoserializable.gradle.plugin;
+package dev.bodewig.autoserializable.gradle.plugin.task;
 
 import dev.bodewig.autoserializable.AutoSerializablePlugin;
 import net.bytebuddy.build.gradle.ByteBuddyJarsTask;
