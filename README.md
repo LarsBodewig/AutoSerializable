@@ -1,8 +1,12 @@
-[![Available on Maven Central](https://img.shields.io/maven-central/v/dev.bodewig.autoserializable/autoserializable?label=Available%20on%20Maven%20Central)](https://central.sonatype.com/namespace/dev.bodewig.autoserializable)
+[![ByteBuddy Plugin on Maven Central](https://img.shields.io/maven-central/v/dev.bodewig.autoserializable/autoserializable?label=ByteBuddy%20Plugin%20on%20Maven%20Central)](https://central.sonatype.com/namespace/dev.bodewig.autoserializable)
+[![Gradle Jars Plugin on Maven Central](https://img.shields.io/maven-central/v/dev.bodewig.autoserializable.jars/dev.bodewig.autoserializable.jars.gradle.plugin?label=Gradle%20Jars%20Plugin%20on%20Maven%20Central)](https://central.sonatype.com/namespace/dev.bodewig.autoserializable.jars)
+[![Gradle Classes Plugin on Maven Central](https://img.shields.io/maven-central/v/dev.bodewig.autoserializable.classes/dev.bodewig.autoserializable.classes.gradle.plugin?label=Gradle%20Classes%20Plugin%20on%20Maven%20Central)](https://central.sonatype.com/namespace/dev.bodewig.autoserializable.classes)
 
 # AutoSerializable
 
-AutoSerializable is a [ByteBuddy](https://github.com/raphw/byte-buddy) plugin to mark all classes as [Serializable](https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/io/Serializable.html) even after compilation.
+AutoSerializable is a [ByteBuddy](https://github.com/raphw/byte-buddy) plugin to mark all classes
+as [Serializable](https://docs.oracle.com/en/java/javase/19/docs/api/java.base/java/io/Serializable.html) even after
+compilation.
 
 This plugin allows you to serialize 3rd-party library classes without modifying the library code or writing custom
 serializers/deserializers for each class (which might not even be possible due to limitations in visiblity and
@@ -19,7 +23,7 @@ For gradle, however, there is a *autoserializable-gradle-plugin*, that preconfig
 plugins {
   id 'dev.bodewig.autoserializable.classes' version '2.0.2-SNAPSHOT' 
   // extends the ByteBuddySimpleTask to serialize local project java classes
-  id 'dev.bodewig.autoserializable.classes' version '2.0.2-SNAPSHOT'
+  id 'dev.bodewig.autoserializable.jars' version '2.0.2-SNAPSHOT'
   // extends the ByteBuddyJarsTask to serialize dependencies of the autoSerializable configuration
 }
 
@@ -33,9 +37,9 @@ You can find examples for maven and gradle in the *autoserializable-test* projec
 
 ### Custom serializers
 
-To inject custom serializers/deserializers into a class, your class has to implement `AutoSerializer` and be annotated
-with `@AutoSerializable`. The class has to be part of the `source` processed by byte-buddy or be available on the
-classpath during plugin execution. The class has to be public.
+To inject custom serializers/deserializers into a class, your class has to extend `AutoSerializer` and be annotated with
+`@AutoSerializable`. The class has to be part of the `source` processed by byte-buddy or be available on the classpath
+during plugin execution. The class has to be public and offer a default constructor.
 
 The gradle plugin automatically supplies the compile classpath and local project java classes as classpath during plugin
 execution to find custom serializers.
