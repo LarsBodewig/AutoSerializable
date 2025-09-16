@@ -15,6 +15,11 @@ import java.util.function.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+/**
+ * Immutable builder for {@link java.io.ObjectInputStream.GetField}
+ *
+ * @param <T> the type to deserialize
+ */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class GetFieldBuilder<T> {
 
@@ -24,6 +29,10 @@ public class GetFieldBuilder<T> {
     private final Map<String, Field> declaredFields;
     private final Set<String> serializedFields;
 
+    /**
+     * Internal constructor to initialize the fields
+     * @param object the instance to deserialize
+     */
     protected GetFieldBuilder(T object) {
         this.getOperations = new TreeMap<>();
         this.object = object;
@@ -38,14 +47,32 @@ public class GetFieldBuilder<T> {
                 Arrays.stream(streamClass.getFields()).map(ObjectStreamField::getName).collect(Collectors.toSet());
     }
 
+    /**
+     * Creates a new {@code GetFieldBuilder} for the supplied instance
+     *
+     * @param object the instance to deserialize
+     * @return the builder instance
+     * @param <T> the type of the instance
+     */
     public static <T> GetFieldBuilder<T> of(T object) {
         return new GetFieldBuilder<>(object);
     }
 
+    /**
+     * Reads all serialized fields from the stream
+     *
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> all() {
         return with(serializedFields.toArray(new String[0]));
     }
 
+    /**
+     * Reads the fields from the stream
+     *
+     * @param fieldNames the fields to read
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> with(String... fieldNames) {
         for (String fieldName : fieldNames) {
             if (!declaredFields.containsKey(fieldName)) {
@@ -79,6 +106,12 @@ public class GetFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Skips the fields in the stream
+     *
+     * @param fieldNames the fields to skip
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> without(String... fieldNames) {
         for (String name : fieldNames) {
             if (!declaredFields.containsKey(name)) {
@@ -89,38 +122,101 @@ public class GetFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Reads a fixed value into the object
+     *
+     * @param fieldName the field to read
+     * @param value the value to set
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> read(String fieldName, boolean value) {
         return read(fieldName, (Object) value);
     }
 
+    /**
+     * Reads a fixed value into the object
+     *
+     * @param fieldName the field to read
+     * @param value the value to set
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> read(String fieldName, char value) {
         return read(fieldName, (Object) value);
     }
 
+    /**
+     * Reads a fixed value into the object
+     *
+     * @param fieldName the field to read
+     * @param value the value to set
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> read(String fieldName, byte value) {
         return read(fieldName, (Object) value);
     }
 
+    /**
+     * Reads a fixed value into the object
+     *
+     * @param fieldName the field to read
+     * @param value the value to set
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> read(String fieldName, short value) {
         return read(fieldName, (Object) value);
     }
 
+    /**
+     * Reads a fixed value into the object
+     *
+     * @param fieldName the field to read
+     * @param value the value to set
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> read(String fieldName, int value) {
         return read(fieldName, (Object) value);
     }
 
+    /**
+     * Reads a fixed value into the object
+     *
+     * @param fieldName the field to read
+     * @param value the value to set
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> read(String fieldName, float value) {
         return read(fieldName, (Object) value);
     }
 
+    /**
+     * Reads a fixed value into the object
+     *
+     * @param fieldName the field to read
+     * @param value the value to set
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> read(String fieldName, long value) {
         return read(fieldName, (Object) value);
     }
 
+    /**
+     * Reads a fixed value into the object
+     *
+     * @param fieldName the field to read
+     * @param value the value to set
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> read(String fieldName, double value) {
         return read(fieldName, (Object) value);
     }
 
+    /**
+     * Reads a fixed value into the object
+     *
+     * @param fieldName the field to read
+     * @param value the value to set
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> read(String fieldName, Object value) {
         assertFieldInDeclaredFields(fieldName);
         Field f = declaredFields.get(fieldName);
@@ -131,6 +227,13 @@ public class GetFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Reads a field from the stream with the supplied default value
+     *
+     * @param fieldName the field to read
+     * @param defaultValue the value if the field is missing in the object descriptor
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readDefault(String fieldName, boolean defaultValue) {
         Field field = assertFieldInDescriptor(fieldName);
         if (field.getType().isPrimitive()) {
@@ -141,10 +244,24 @@ public class GetFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Reads a field from the stream with the supplied default value
+     *
+     * @param fieldName the field to read
+     * @param defaultValue the value if the field is missing in the object descriptor
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readDefault(String fieldName, byte defaultValue) {
         return readNumeric(fieldName, defaultValue);
     }
 
+    /**
+     * Reads a field from the stream with the supplied default value
+     *
+     * @param fieldName the field to read
+     * @param defaultValue the value if the field is missing in the object descriptor
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readDefault(String fieldName, char defaultValue) {
         Field field = assertFieldInDescriptor(fieldName);
         if (field.getType().isPrimitive()) {
@@ -155,29 +272,72 @@ public class GetFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Reads a field from the stream with the supplied default value
+     *
+     * @param fieldName the field to read
+     * @param defaultValue the value if the field is missing in the object descriptor
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readDefault(String fieldName, short defaultValue) {
         return readNumeric(fieldName, defaultValue);
     }
 
+    /**
+     * Reads a field from the stream with the supplied default value
+     *
+     * @param fieldName the field to read
+     * @param defaultValue the value if the field is missing in the object descriptor
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readDefault(String fieldName, int defaultValue) {
         return readNumeric(fieldName, defaultValue);
     }
 
+    /**
+     * Reads a field from the stream with the supplied default value
+     *
+     * @param fieldName the field to read
+     * @param defaultValue the value if the field is missing in the object descriptor
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readDefault(String fieldName, float defaultValue) {
         return readNumeric(fieldName, defaultValue);
     }
 
+    /**
+     * Reads a field from the stream with the supplied default value
+     *
+     * @param fieldName the field to read
+     * @param defaultValue the value if the field is missing in the object descriptor
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readDefault(String fieldName, long defaultValue) {
         return readNumeric(fieldName, defaultValue);
     }
 
+    /**
+     * Reads a field from the stream with the supplied default value
+     *
+     * @param fieldName the field to read
+     * @param defaultValue the value if the field is missing in the object descriptor
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readDefault(String fieldName, double defaultValue) {
         return readNumeric(fieldName, defaultValue);
     }
 
+    /**
+     * Reads a field from the stream with the supplied default value
+     *
+     * @param fieldName the field to read
+     * @param defaultValue the value if the field is missing in the object descriptor
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readDefault(String fieldName, Object defaultValue) {
         Field field = assertFieldInDescriptor(fieldName);
-        getOperations.put(fieldName, gf -> gf.get(fieldName, defaultValue != null ? field.getType().cast(defaultValue) : null));
+        getOperations.put(fieldName,
+                gf -> gf.get(fieldName, defaultValue != null ? field.getType().cast(defaultValue) : null));
         return this;
     }
 
@@ -219,6 +379,13 @@ public class GetFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Reads a field from the stream with the computed default value
+     *
+     * @param fieldName the field to read
+     * @param defaultValue the supplier to compute a value if the field is missing in the object descriptor
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readComputedDefault(String fieldName, BooleanSupplier defaultValue) {
         Field field = assertFieldInDescriptor(fieldName);
         getOperations.put(fieldName,
@@ -226,6 +393,13 @@ public class GetFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Reads a field from the stream with the computed default value
+     *
+     * @param fieldName the field to read
+     * @param defaultValue the supplier to compute a value if the field is missing in the object descriptor
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readComputedDefault(String fieldName, ByteSupplier defaultValue) {
         Field field = assertFieldInDescriptor(fieldName);
         getOperations.put(fieldName, gf -> gf.get(fieldName,
@@ -233,6 +407,13 @@ public class GetFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Reads a field from the stream with the computed default value
+     *
+     * @param fieldName the field to read
+     * @param defaultValue the supplier to compute a value if the field is missing in the object descriptor
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readComputedDefault(String fieldName, CharSupplier defaultValue) {
         Field field = assertFieldInDescriptor(fieldName);
         getOperations.put(fieldName, gf -> gf.get(fieldName,
@@ -240,6 +421,13 @@ public class GetFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Reads a field from the stream with the computed default value
+     *
+     * @param fieldName the field to read
+     * @param defaultValue the supplier to compute a value if the field is missing in the object descriptor
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readComputedDefault(String fieldName, ShortSupplier defaultValue) {
         Field field = assertFieldInDescriptor(fieldName);
         getOperations.put(fieldName, gf -> gf.get(fieldName,
@@ -247,6 +435,13 @@ public class GetFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Reads a field from the stream with the computed default value
+     *
+     * @param fieldName the field to read
+     * @param defaultValue the supplier to compute a value if the field is missing in the object descriptor
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readComputedDefault(String fieldName, IntSupplier defaultValue) {
         Field field = assertFieldInDescriptor(fieldName);
         getOperations.put(fieldName,
@@ -254,6 +449,13 @@ public class GetFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Reads a field from the stream with the computed default value
+     *
+     * @param fieldName the field to read
+     * @param defaultValue the supplier to compute a value if the field is missing in the object descriptor
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readComputedDefault(String fieldName, FloatSupplier defaultValue) {
         Field field = assertFieldInDescriptor(fieldName);
         getOperations.put(fieldName, gf -> gf.get(fieldName,
@@ -261,6 +463,13 @@ public class GetFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Reads a field from the stream with the computed default value
+     *
+     * @param fieldName the field to read
+     * @param defaultValue the supplier to compute a value if the field is missing in the object descriptor
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readComputedDefault(String fieldName, LongSupplier defaultValue) {
         Field field = assertFieldInDescriptor(fieldName);
         getOperations.put(fieldName, gf -> gf.get(fieldName,
@@ -268,6 +477,13 @@ public class GetFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Reads a field from the stream with the computed default value
+     *
+     * @param fieldName the field to read
+     * @param defaultValue the supplier to compute a value if the field is missing in the object descriptor
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readComputedDefault(String fieldName, DoubleSupplier defaultValue) {
         Field field = assertFieldInDescriptor(fieldName);
         getOperations.put(fieldName, gf -> gf.get(fieldName,
@@ -275,61 +491,132 @@ public class GetFieldBuilder<T> {
         return this;
     }
 
-    public <V> GetFieldBuilder<T> readComputedDefault(String fieldName, Supplier<V> defaultValue) {
+    /**
+     * Reads a field from the stream with the computed default value
+     *
+     * @param fieldName the field to read
+     * @param defaultValue the supplier to compute a value if the field is missing in the object descriptor
+     * @return the builder instance
+     */
+    public GetFieldBuilder<T> readComputedDefault(String fieldName, Supplier<?> defaultValue) {
         Field field = assertFieldInDescriptor(fieldName);
         getOperations.put(fieldName,
                 gf -> gf.get(fieldName, field.getType().cast(gf.defaulted(fieldName) ? defaultValue.get() : null)));
         return this;
     }
 
+    /**
+     * Reads a field from the stream and transforms the value using the function
+     *
+     * @param fieldName the field to read
+     * @param function the function to transform the value
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readTransformed(String fieldName, BooleanUnaryOperator function) {
         Field field = assertFieldInDescriptor(fieldName);
         getOperations.put(fieldName, gf -> function.applyAsBoolean(gf.get(fieldName, false)));
         return this;
     }
 
+    /**
+     * Reads a field from the stream and transforms the value using the function
+     *
+     * @param fieldName the field to read
+     * @param function the function to transform the value
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readTransformed(String fieldName, ByteUnaryOperator function) {
         Field field = assertFieldInDescriptor(fieldName);
         getOperations.put(fieldName, gf -> function.applyAsByte(gf.get(fieldName, (byte) 0)));
         return this;
     }
 
+    /**
+     * Reads a field from the stream and transforms the value using the function
+     *
+     * @param fieldName the field to read
+     * @param function the function to transform the value
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readTransformed(String fieldName, CharUnaryOperator function) {
         Field field = assertFieldInDescriptor(fieldName);
         getOperations.put(fieldName, gf -> function.applyAsChar(gf.get(fieldName, (char) 0)));
         return this;
     }
 
+    /**
+     * Reads a field from the stream and transforms the value using the function
+     *
+     * @param fieldName the field to read
+     * @param function the function to transform the value
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readTransformed(String fieldName, ShortUnaryOperator function) {
         Field field = assertFieldInDescriptor(fieldName);
         getOperations.put(fieldName, gf -> function.applyAsShort(gf.get(fieldName, (short) 0)));
         return this;
     }
 
+    /**
+     * Reads a field from the stream and transforms the value using the function
+     *
+     * @param fieldName the field to read
+     * @param function the function to transform the value
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readTransformed(String fieldName, IntUnaryOperator function) {
         Field field = assertFieldInDescriptor(fieldName);
         getOperations.put(fieldName, gf -> function.applyAsInt(gf.get(fieldName, (int) 0)));
         return this;
     }
 
+    /**
+     * Reads a field from the stream and transforms the value using the function
+     *
+     * @param fieldName the field to read
+     * @param function the function to transform the value
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readTransformed(String fieldName, FloatUnaryOperator function) {
         Field field = assertFieldInDescriptor(fieldName);
         getOperations.put(fieldName, gf -> function.applyAsFloat(gf.get(fieldName, (float) 0)));
         return this;
     }
 
+    /**
+     * Reads a field from the stream and transforms the value using the function
+     *
+     * @param fieldName the field to read
+     * @param function the function to transform the value
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readTransformed(String fieldName, LongUnaryOperator function) {
         Field field = assertFieldInDescriptor(fieldName);
         getOperations.put(fieldName, gf -> function.applyAsLong(gf.get(fieldName, (long) 0)));
         return this;
     }
 
+    /**
+     * Reads a field from the stream and transforms the value using the function
+     *
+     * @param fieldName the field to read
+     * @param function the function to transform the value
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readTransformed(String fieldName, DoubleUnaryOperator function) {
         Field field = assertFieldInDescriptor(fieldName);
         getOperations.put(fieldName, gf -> function.applyAsDouble(gf.get(fieldName, (double) 0)));
         return this;
     }
 
+    /**
+     * Reads a field from the stream and transforms the value using the function
+     *
+     * @param fieldName the field to read
+     * @param function the function to transform the value
+     * @param <V>       the target type of the transformation
+     * @return the builder instance
+     */
     @SuppressWarnings("unchecked") // unavoidable due to deserialization
     public <V> GetFieldBuilder<T> readTransformed(String fieldName, UnaryOperator<V> function) {
         Field field = assertFieldInDescriptor(fieldName);
@@ -337,44 +624,114 @@ public class GetFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Reads a fixed value into the object
+     *
+     * @param fieldName the field to read
+     * @param function the supplier to compute a value
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readComputed(String fieldName, BooleanSupplier function) {
         return readComputed(fieldName, (Supplier<Object>) function::getAsBoolean);
     }
 
+    /**
+     * Reads a fixed value into the object
+     *
+     * @param fieldName the field to read
+     * @param function the supplier to compute a value
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readComputed(String fieldName, CharSupplier function) {
         return readComputed(fieldName, (Supplier<Object>) function::getAsChar);
     }
 
+    /**
+     * Reads a fixed value into the object
+     *
+     * @param fieldName the field to read
+     * @param function the supplier to compute a value
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readComputed(String fieldName, ByteSupplier function) {
         return readComputed(fieldName, (Supplier<Object>) function::getAsByte);
     }
 
+    /**
+     * Reads a fixed value into the object
+     *
+     * @param fieldName the field to read
+     * @param function the supplier to compute a value
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readComputed(String fieldName, ShortSupplier function) {
         return readComputed(fieldName, (Supplier<Object>) function::getAsShort);
     }
 
+    /**
+     * Reads a fixed value into the object
+     *
+     * @param fieldName the field to read
+     * @param function the supplier to compute a value
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readComputed(String fieldName, IntSupplier function) {
         return readComputed(fieldName, (Supplier<Object>) function::getAsInt);
     }
 
+    /**
+     * Reads a fixed value into the object
+     *
+     * @param fieldName the field to read
+     * @param function the supplier to compute a value
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readComputed(String fieldName, FloatSupplier function) {
         return readComputed(fieldName, (Supplier<Object>) function::getAsFloat);
     }
 
+    /**
+     * Reads a fixed value into the object
+     *
+     * @param fieldName the field to read
+     * @param function the supplier to compute a value
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readComputed(String fieldName, LongSupplier function) {
         return readComputed(fieldName, (Supplier<Object>) function::getAsLong);
     }
 
+    /**
+     * Reads a fixed value into the object
+     *
+     * @param fieldName the field to read
+     * @param function the supplier to compute a value
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readComputed(String fieldName, DoubleSupplier function) {
         return readComputed(fieldName, (Supplier<Object>) function::getAsDouble);
     }
 
+    /**
+     * Reads a fixed value into the object
+     *
+     * @param fieldName the field to read
+     * @param function the supplier to compute a value
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readComputed(String fieldName, Supplier<Object> function) {
         assertFieldInDeclaredFields(fieldName);
         getOperations.put(fieldName, gf -> function.get());
         return this;
     }
 
+    /**
+     * Reads a value from the custom function into the object
+     *
+     * @param fieldName the field to read
+     * @param function a custom function to read and transform a value from {@code GetField}
+     * @return the builder instance
+     */
     public GetFieldBuilder<T> readComputed(String fieldName,
                                            ThrowingFunction<ObjectInputStream.GetField, Object, Exception> function) {
         assertFieldInDeclaredFields(fieldName);
@@ -382,6 +739,11 @@ public class GetFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Applies the builder by reading the values from the stream into the object
+     *
+     * @param in the stream to read from
+     */
     public void readFields(ObjectInputStream in) {
         try {
             logger.info("getFields: " + getOperations.keySet());

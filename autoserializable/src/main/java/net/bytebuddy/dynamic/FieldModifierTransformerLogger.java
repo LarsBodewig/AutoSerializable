@@ -25,7 +25,7 @@ public interface FieldModifierTransformerLogger {
     /**
      * Logger implementations for changes of visibility modifiers
      */
-    class ForVisibility {
+    interface ForVisibility {
 
         /**
          * Maps a numeric representation of the modifiers to a {@code Visibility} enum value
@@ -63,7 +63,7 @@ public interface FieldModifierTransformerLogger {
         /**
          * Default implementation for changes of visibility modifiers using JUL (java.util.logging)
          */
-        public static class DefaultJUL implements FieldModifierTransformerLogger {
+        class DefaultJUL implements FieldModifierTransformerLogger {
 
             /**
              * The logger instance to use

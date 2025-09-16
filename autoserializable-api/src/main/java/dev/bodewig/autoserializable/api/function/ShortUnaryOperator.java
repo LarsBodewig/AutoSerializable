@@ -2,6 +2,9 @@ package dev.bodewig.autoserializable.api.function;
 
 import java.util.Objects;
 
+/**
+ * A specialization of {@link java.util.function.UnaryOperator} returning a {@code short}
+ */
 @SuppressWarnings("unused")
 @FunctionalInterface
 public interface ShortUnaryOperator {
