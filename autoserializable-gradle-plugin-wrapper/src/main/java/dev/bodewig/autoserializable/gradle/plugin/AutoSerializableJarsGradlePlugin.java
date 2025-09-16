@@ -10,6 +10,7 @@ import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.file.ConfigurableFileTree;
+import org.gradle.api.file.Directory;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.provider.Provider;
@@ -121,7 +122,8 @@ public class AutoSerializableJarsGradlePlugin implements Plugin<Project> {
         // create task to make downloaded dependencies serializable
         TaskProvider<AutoSerializableJarsTask> autoSerializableJarsTask = project.getTasks()
                 .register(AutoSerializableJarsTask.TASK_NAME, AutoSerializableJarsTask.class, task -> {
-                    task.setSource(pullJarsTask.map(PullJarsTask::getPulledDir).get().get().getAsFile());
+                    Directory pulledDir = pullJarsTask.map(PullJarsTask::getPulledDir).get().get();
+                    task.setSource(pulledDir.getAsFile());
                     task.setClassPath(serializersConfig);
                     task.dependsOn(preAssembleJarTask);
                 });
