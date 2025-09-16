@@ -1,3 +1,9 @@
+# v2.1.0
+
+* Added PutFieldBuilder and GetFieldBuilder to create custom Serializers
+* Return instance from TestFactory
+
+
 # v2.0.2
 
 * Fix logging
