@@ -15,6 +15,8 @@ import java.io.ObjectOutputStream;
  */
 public class AutoSerializer<T> {
 
+    public static final String FIELD_NAME = "_serializer";
+
     /**
      * Default constructor
      */

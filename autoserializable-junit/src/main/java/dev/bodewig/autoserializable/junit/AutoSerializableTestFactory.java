@@ -5,6 +5,7 @@ import dev.bodewig.autoserializable.api.AutoSerializableAll;
 import dev.bodewig.autoserializable.api.AutoSerialized;
 import dev.bodewig.autoserializable.api.AutoSerializer;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.function.ThrowingConsumer;
 import org.junit.platform.commons.util.AnnotationUtils;
 import org.junit.platform.commons.util.ClassFilter;
@@ -16,6 +17,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -24,9 +26,10 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Factory to create a stream of {@link DynamicTest}s for set of {@link AutoSerialized} types.
  * <p>
- * Unit tests using this factory have to return the stream and use the {@link org.junit.jupiter.api.TestFactory}
+ * Unit tests using this factory have to return the stream and use the {@link TestFactory}
  * annotation.
  */
+@SuppressWarnings("unused")
 public class AutoSerializableTestFactory {
 
     /**
@@ -105,21 +108,27 @@ public class AutoSerializableTestFactory {
      * Tests a single object instance for serialization and deserialization failure. Throws if any exception occurs.
      *
      * @param instance the object to test
+     * @param <T>      the object type
+     * @return the serialized and deserialized object
      */
-    public static void testSerialization(Object instance) {
+    @SuppressWarnings("unchecked") // unavoidable due to deserialization
+    public static <T> T testSerialization(T instance) {
+        AtomicReference<T> result = new AtomicReference<>();
         assertDoesNotThrow(() -> {
             byte[] data;
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
                  ObjectOutputStream oos = new ObjectOutputStream(baos)) {
                 oos.writeObject(instance);
+                oos.flush();
                 data = baos.toByteArray();
             }
             try (ByteArrayInputStream bais = new ByteArrayInputStream(data);
                  ObjectInputStream ois = new ObjectInputStream(bais)) {
-                ois.readObject();
+                result.set((T) ois.readObject());
             }
         }, "testSerialization failed on " +
                 Optional.ofNullable(instance.getClass().getCanonicalName()).orElse("(anonymous class)"));
+        return result.get();
     }
 
     private AutoSerializableTestFactory test(Stream<Class<?>> inputStream, String testName,
@@ -158,7 +167,7 @@ public class AutoSerializableTestFactory {
     /**
      * Returns a stream of {@link DynamicTest}s containing the selected tests for each source type
      * <p>
-     * Unit tests have to return this stream and use the {@link org.junit.jupiter.api.TestFactory} annotation.
+     * Unit tests have to return this stream and use the {@link TestFactory} annotation.
      *
      * @return the stream containing the {@link DynamicTest}s
      */

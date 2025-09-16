@@ -78,7 +78,8 @@ public class AutoSerializableClassesGradlePlugin implements Plugin<Project> {
         // create task to make downloaded dependencies serializable
         TaskProvider<AutoSerializableClassesTask> autoSerializableClassesTask = project.getTasks()
                 .register(AutoSerializableClassesTask.TASK_NAME, AutoSerializableClassesTask.class, task -> {
-                    task.setInPlace(compileTask.get().getDestinationDirectory());
+                    DirectoryProperty compiledDir = compileTask.get().getDestinationDirectory();
+                    task.setInPlace(compiledDir);
                     task.setClassPath(serializersConfig);
                     task.dependsOn(preAssembleJarTask);
                     // order tasks if both plugins are used

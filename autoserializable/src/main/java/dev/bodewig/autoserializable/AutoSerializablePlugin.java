@@ -30,7 +30,6 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
  */
 public class AutoSerializablePlugin extends NonPrivatePlugin implements Plugin.WithPreprocessor {
 
-    private static final String FIELD_NAME = "_serializer";
     private static final Logger logger = Logger.getLogger(AutoSerializablePlugin.class.getCanonicalName());
     private static final Map<TypeDescription, TypeDescription> typeToSerializer = new HashMap<>();
     private static volatile boolean classpathSearched = false;
@@ -99,6 +98,14 @@ public class AutoSerializablePlugin extends NonPrivatePlugin implements Plugin.W
     @Override
     public DynamicType.Builder<?> apply(DynamicType.Builder<?> builder, TypeDescription typeDescription,
                                         ClassFileLocator classFileLocator) {
+        // skip already processed classes
+        if (typeDescription.getDeclaredAnnotations().isAnnotationPresent(AutoSerialized.class)) {
+            return builder;
+        }
+
+        // mark type as AutoSerialized
+        builder = builder.annotateType(AnnotationDescription.Builder.ofType(AutoSerialized.class).build());
+
         // make all private types and fields package-private
         builder = super.apply(builder, typeDescription, classFileLocator);
 
@@ -107,16 +114,11 @@ public class AutoSerializablePlugin extends NonPrivatePlugin implements Plugin.W
             return builder;
         }
 
-        // mark type as AutoSerialized
-        if (typeDescription.getDeclaredAnnotations().isAnnotationPresent(AutoSerialized.class)) {
-            return builder;
-        }
-        builder = builder.annotateType(AnnotationDescription.Builder.ofType(AutoSerialized.class).build());
-
-        // implements Serializable
         boolean implementsSerializable = typeDescription.isEnum()// typeDescriptions of Enums don't declare implementing
                 // Serializable, but do after compilation leading to exceptions when trying to add it explicitly
                 || typeDescription.getInterfaces().stream().anyMatch(i -> i.represents(Serializable.class));
+
+        // implements Serializable
         if (!implementsSerializable) {
             builder = builder.implement(Serializable.class);
         }
@@ -134,13 +136,13 @@ public class AutoSerializablePlugin extends NonPrivatePlugin implements Plugin.W
         }
 
         // private static final AutoSerializer _serializer;
-        builder = builder.defineField(FIELD_NAME, TypeDescription.Generic.Builder.rawType(AutoSerializer.class).build(),
+        builder = builder.defineField(AutoSerializer.FIELD_NAME, TypeDescription.ForLoadedType.of(AutoSerializer.class),
                 Visibility.PRIVATE, Ownership.STATIC, FieldManifestation.FINAL);
 
         // static { _serializer = new <serializer>(); }
         builder = builder.invokable(isTypeInitializer()).intercept(
                 MethodCall.construct(serializer.getDeclaredMethods().filter(isDefaultConstructor()).getOnly())
-                        .setsField(named(FIELD_NAME)));
+                        .setsField(named(AutoSerializer.FIELD_NAME)));
 
         // private void writeObject(java.io.ObjectOutputStream out) throws IOException {
         //     _serializer.writeObject(out, this);
@@ -149,8 +151,10 @@ public class AutoSerializablePlugin extends NonPrivatePlugin implements Plugin.W
             builder = builder.defineMethod("writeObject", void.class, Opcodes.ACC_PRIVATE)
                     .withParameter(ObjectOutputStream.class, "out").throwing(IOException.class).intercept(
                             MethodCall.invoke(
-                                    AutoSerializer.class.getDeclaredMethod("writeObject", ObjectOutputStream.class,
-                                            Object.class)).onField(FIELD_NAME).withArgument(0).withThis());
+                                            AutoSerializer.class.getDeclaredMethod("writeObject",
+                                                    ObjectOutputStream.class,
+                                                    Object.class)).onField(AutoSerializer.FIELD_NAME).withArgument(0)
+                                    .withThis());
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
@@ -164,7 +168,7 @@ public class AutoSerializablePlugin extends NonPrivatePlugin implements Plugin.W
                     .throwing(IOException.class, ClassNotFoundException.class).intercept(MethodCall.invoke(
                                     AutoSerializer.class.getDeclaredMethod("readObject", ObjectInputStream.class,
                                             Object.class))
-                            .onField(FIELD_NAME).withArgument(0).withThis());
+                            .onField(AutoSerializer.FIELD_NAME).withArgument(0).withThis());
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
