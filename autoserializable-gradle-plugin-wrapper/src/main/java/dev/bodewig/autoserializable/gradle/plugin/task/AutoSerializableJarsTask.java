@@ -17,6 +17,7 @@ public class AutoSerializableJarsTask extends ByteBuddyJarsTask {
      * The default name of the task
      */
     public static final String TASK_NAME = "autoSerializableJars";
+
     /**
      * The default name of the output directory
      */

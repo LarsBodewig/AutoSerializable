@@ -1,3 +1,5 @@
+//file:noinspection GrUnresolvedAccess
+//file:noinspection GroovyAssignabilityCheck
 import dev.bodewig.autoserializable.gradle.plugin.output.AutoSerializableClassesOutput
 import dev.bodewig.autoserializable.gradle.plugin.output.AutoSerializableJarsOutput
 import dev.bodewig.autoserializable.gradle.plugin.output.JavaClassesOutput
@@ -21,18 +23,18 @@ java {
 
 def testOutput = tasks.register('testOutput') {
     doFirst(() -> {
-        JavaClassesOutput javaClassesOutput = project.getExtensions().getByType(JavaClassesOutput.class);
-        Set<String> one = javaClassesOutput.getClassFiles().get();
-        System.out.println("\nJavaClassesOutput: " + one);
-        assert !one.isEmpty() : "JavaClassesOutput was empty";
-        AutoSerializableJarsOutput autoSerializableJarsOutput = project.getExtensions().getByType(AutoSerializableJarsOutput.class);
-        Set<String> two = autoSerializableJarsOutput.getJarFiles().get();
-        System.out.println("\nAutoSerializableJarsOutput: " + two);
-        assert !two.isEmpty() : "AutoSerializableJarsOutput was empty";
-        AutoSerializableClassesOutput autoSerializableClassesOutput = project.getExtensions().getByType(AutoSerializableClassesOutput.class);
-        Set<String> three = autoSerializableClassesOutput.getClassFiles().get();
-        System.out.println("\nAutoSerializableClassesOutput: " + three);
-        assert !three.isEmpty() : "AutoSerializableClassesOutput was empty";
+        JavaClassesOutput javaClassesOutput = project.getExtensions().getByType(JavaClassesOutput.class)
+        Set<String> one = javaClassesOutput.getClassFiles().get()
+        System.out.println("\nJavaClassesOutput: " + one)
+        assert !one.isEmpty(): "JavaClassesOutput was empty"
+        AutoSerializableJarsOutput autoSerializableJarsOutput = project.getExtensions().getByType(AutoSerializableJarsOutput.class)
+        Set<String> two = autoSerializableJarsOutput.getJarFiles().get()
+        System.out.println("\nAutoSerializableJarsOutput: " + two)
+        assert !two.isEmpty(): "AutoSerializableJarsOutput was empty"
+        AutoSerializableClassesOutput autoSerializableClassesOutput = project.getExtensions().getByType(AutoSerializableClassesOutput.class)
+        Set<String> three = autoSerializableClassesOutput.getClassFiles().get()
+        System.out.println("\nAutoSerializableClassesOutput: " + three)
+        assert !three.isEmpty(): "AutoSerializableClassesOutput was empty"
     })
 }
 

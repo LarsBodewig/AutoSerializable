@@ -7,6 +7,7 @@ import net.bytebuddy.description.type.TypeDescription;
 /**
  * Extends the {@link Transformer.ForField.FieldModifierTransformer} to log in case the field modifier was changed
  */
+@SuppressWarnings("NullableProblems")
 public class LoggingFieldModifierTransformer extends Transformer.ForField.FieldModifierTransformer {
 
     /**

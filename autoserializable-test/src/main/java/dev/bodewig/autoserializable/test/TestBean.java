@@ -1,5 +1,6 @@
 package dev.bodewig.autoserializable.test;
 
+@SuppressWarnings({"unused", "FieldMayBeFinal"})
 class TestBean {
     private String abc = "abc";
     final int zero;

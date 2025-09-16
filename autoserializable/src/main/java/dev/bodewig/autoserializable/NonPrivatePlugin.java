@@ -17,6 +17,7 @@ import static net.bytebuddy.matcher.ElementMatchers.isPrivate;
 /**
  * A Byte-Buddy plugin to make all private types and fields package-private
  */
+@SuppressWarnings("NullableProblems")
 public class NonPrivatePlugin implements Plugin {
 
     private static final Logger logger = Logger.getLogger(NonPrivatePlugin.class.getCanonicalName());

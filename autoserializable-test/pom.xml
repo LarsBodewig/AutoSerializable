@@ -12,6 +12,11 @@
     <artifactId>autoserializable-test</artifactId>
     <name>AutoSerializable Test</name>
 
+    <properties>
+        <!-- default to false -->
+        <maven.test.skip>false</maven.test.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>dev.bodewig.autoserializable</groupId>
@@ -22,14 +27,11 @@
             <groupId>dev.bodewig.autoserializable</groupId>
             <artifactId>autoserializable-junit</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>dev.bodewig.autoserializable</groupId>
             <artifactId>autoserializable-gradle-plugin-wrapper</artifactId>
             <version>${project.version}</version>
-            <type>pom</type>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -57,6 +59,27 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <configuration>
+                    <skipSource>true</skipSource>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-install-plugin</artifactId>
                 <configuration>
                     <skip>true</skip>
@@ -73,7 +96,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <skip>true</skip>
+                    <skip>true</skip> <!-- run tests only in profile -->
                 </configuration>
             </plugin>
         </plugins>

@@ -12,14 +12,17 @@ public final class AutoSerializableDependencies {
      * The groupId of the project
      */
     public static final String GROUP_ID = "dev.bodewig.autoserializable";
+
     /**
      * The artifactId for the api dependency
      */
     public static final String API_ARTIFACT_ID = "autoserializable-api";
+
     /**
      * The artifactId for the junit dependency
      */
     public static final String JUNIT_ARTIFACT_ID = "autoserializable-junit";
+
     /**
      * The version of the project
      */

@@ -19,6 +19,7 @@ public class PullJarsTask extends Copy {
      * The default name of the task
      */
     public static final String TASK_NAME = "pullJars";
+
     /**
      * The default name of the output directory
      */

@@ -31,6 +31,7 @@ public class GetFieldBuilder<T> {
 
     /**
      * Internal constructor to initialize the fields
+     *
      * @param object the instance to deserialize
      */
     protected GetFieldBuilder(T object) {
@@ -51,8 +52,8 @@ public class GetFieldBuilder<T> {
      * Creates a new {@code GetFieldBuilder} for the supplied instance
      *
      * @param object the instance to deserialize
+     * @param <T>    the type of the instance
      * @return the builder instance
-     * @param <T> the type of the instance
      */
     public static <T> GetFieldBuilder<T> of(T object) {
         return new GetFieldBuilder<>(object);
@@ -126,7 +127,7 @@ public class GetFieldBuilder<T> {
      * Reads a fixed value into the object
      *
      * @param fieldName the field to read
-     * @param value the value to set
+     * @param value     the value to set
      * @return the builder instance
      */
     public GetFieldBuilder<T> read(String fieldName, boolean value) {
@@ -137,7 +138,7 @@ public class GetFieldBuilder<T> {
      * Reads a fixed value into the object
      *
      * @param fieldName the field to read
-     * @param value the value to set
+     * @param value     the value to set
      * @return the builder instance
      */
     public GetFieldBuilder<T> read(String fieldName, char value) {
@@ -148,7 +149,7 @@ public class GetFieldBuilder<T> {
      * Reads a fixed value into the object
      *
      * @param fieldName the field to read
-     * @param value the value to set
+     * @param value     the value to set
      * @return the builder instance
      */
     public GetFieldBuilder<T> read(String fieldName, byte value) {
@@ -159,7 +160,7 @@ public class GetFieldBuilder<T> {
      * Reads a fixed value into the object
      *
      * @param fieldName the field to read
-     * @param value the value to set
+     * @param value     the value to set
      * @return the builder instance
      */
     public GetFieldBuilder<T> read(String fieldName, short value) {
@@ -170,7 +171,7 @@ public class GetFieldBuilder<T> {
      * Reads a fixed value into the object
      *
      * @param fieldName the field to read
-     * @param value the value to set
+     * @param value     the value to set
      * @return the builder instance
      */
     public GetFieldBuilder<T> read(String fieldName, int value) {
@@ -181,7 +182,7 @@ public class GetFieldBuilder<T> {
      * Reads a fixed value into the object
      *
      * @param fieldName the field to read
-     * @param value the value to set
+     * @param value     the value to set
      * @return the builder instance
      */
     public GetFieldBuilder<T> read(String fieldName, float value) {
@@ -192,7 +193,7 @@ public class GetFieldBuilder<T> {
      * Reads a fixed value into the object
      *
      * @param fieldName the field to read
-     * @param value the value to set
+     * @param value     the value to set
      * @return the builder instance
      */
     public GetFieldBuilder<T> read(String fieldName, long value) {
@@ -203,7 +204,7 @@ public class GetFieldBuilder<T> {
      * Reads a fixed value into the object
      *
      * @param fieldName the field to read
-     * @param value the value to set
+     * @param value     the value to set
      * @return the builder instance
      */
     public GetFieldBuilder<T> read(String fieldName, double value) {
@@ -214,7 +215,7 @@ public class GetFieldBuilder<T> {
      * Reads a fixed value into the object
      *
      * @param fieldName the field to read
-     * @param value the value to set
+     * @param value     the value to set
      * @return the builder instance
      */
     public GetFieldBuilder<T> read(String fieldName, Object value) {
@@ -230,7 +231,7 @@ public class GetFieldBuilder<T> {
     /**
      * Reads a field from the stream with the supplied default value
      *
-     * @param fieldName the field to read
+     * @param fieldName    the field to read
      * @param defaultValue the value if the field is missing in the object descriptor
      * @return the builder instance
      */
@@ -247,7 +248,7 @@ public class GetFieldBuilder<T> {
     /**
      * Reads a field from the stream with the supplied default value
      *
-     * @param fieldName the field to read
+     * @param fieldName    the field to read
      * @param defaultValue the value if the field is missing in the object descriptor
      * @return the builder instance
      */
@@ -258,7 +259,7 @@ public class GetFieldBuilder<T> {
     /**
      * Reads a field from the stream with the supplied default value
      *
-     * @param fieldName the field to read
+     * @param fieldName    the field to read
      * @param defaultValue the value if the field is missing in the object descriptor
      * @return the builder instance
      */
@@ -275,7 +276,7 @@ public class GetFieldBuilder<T> {
     /**
      * Reads a field from the stream with the supplied default value
      *
-     * @param fieldName the field to read
+     * @param fieldName    the field to read
      * @param defaultValue the value if the field is missing in the object descriptor
      * @return the builder instance
      */
@@ -286,7 +287,7 @@ public class GetFieldBuilder<T> {
     /**
      * Reads a field from the stream with the supplied default value
      *
-     * @param fieldName the field to read
+     * @param fieldName    the field to read
      * @param defaultValue the value if the field is missing in the object descriptor
      * @return the builder instance
      */
@@ -297,7 +298,7 @@ public class GetFieldBuilder<T> {
     /**
      * Reads a field from the stream with the supplied default value
      *
-     * @param fieldName the field to read
+     * @param fieldName    the field to read
      * @param defaultValue the value if the field is missing in the object descriptor
      * @return the builder instance
      */
@@ -308,7 +309,7 @@ public class GetFieldBuilder<T> {
     /**
      * Reads a field from the stream with the supplied default value
      *
-     * @param fieldName the field to read
+     * @param fieldName    the field to read
      * @param defaultValue the value if the field is missing in the object descriptor
      * @return the builder instance
      */
@@ -319,7 +320,7 @@ public class GetFieldBuilder<T> {
     /**
      * Reads a field from the stream with the supplied default value
      *
-     * @param fieldName the field to read
+     * @param fieldName    the field to read
      * @param defaultValue the value if the field is missing in the object descriptor
      * @return the builder instance
      */
@@ -330,7 +331,7 @@ public class GetFieldBuilder<T> {
     /**
      * Reads a field from the stream with the supplied default value
      *
-     * @param fieldName the field to read
+     * @param fieldName    the field to read
      * @param defaultValue the value if the field is missing in the object descriptor
      * @return the builder instance
      */
@@ -382,7 +383,7 @@ public class GetFieldBuilder<T> {
     /**
      * Reads a field from the stream with the computed default value
      *
-     * @param fieldName the field to read
+     * @param fieldName    the field to read
      * @param defaultValue the supplier to compute a value if the field is missing in the object descriptor
      * @return the builder instance
      */
@@ -396,7 +397,7 @@ public class GetFieldBuilder<T> {
     /**
      * Reads a field from the stream with the computed default value
      *
-     * @param fieldName the field to read
+     * @param fieldName    the field to read
      * @param defaultValue the supplier to compute a value if the field is missing in the object descriptor
      * @return the builder instance
      */
@@ -410,7 +411,7 @@ public class GetFieldBuilder<T> {
     /**
      * Reads a field from the stream with the computed default value
      *
-     * @param fieldName the field to read
+     * @param fieldName    the field to read
      * @param defaultValue the supplier to compute a value if the field is missing in the object descriptor
      * @return the builder instance
      */
@@ -424,7 +425,7 @@ public class GetFieldBuilder<T> {
     /**
      * Reads a field from the stream with the computed default value
      *
-     * @param fieldName the field to read
+     * @param fieldName    the field to read
      * @param defaultValue the supplier to compute a value if the field is missing in the object descriptor
      * @return the builder instance
      */
@@ -438,7 +439,7 @@ public class GetFieldBuilder<T> {
     /**
      * Reads a field from the stream with the computed default value
      *
-     * @param fieldName the field to read
+     * @param fieldName    the field to read
      * @param defaultValue the supplier to compute a value if the field is missing in the object descriptor
      * @return the builder instance
      */
@@ -452,7 +453,7 @@ public class GetFieldBuilder<T> {
     /**
      * Reads a field from the stream with the computed default value
      *
-     * @param fieldName the field to read
+     * @param fieldName    the field to read
      * @param defaultValue the supplier to compute a value if the field is missing in the object descriptor
      * @return the builder instance
      */
@@ -466,7 +467,7 @@ public class GetFieldBuilder<T> {
     /**
      * Reads a field from the stream with the computed default value
      *
-     * @param fieldName the field to read
+     * @param fieldName    the field to read
      * @param defaultValue the supplier to compute a value if the field is missing in the object descriptor
      * @return the builder instance
      */
@@ -480,7 +481,7 @@ public class GetFieldBuilder<T> {
     /**
      * Reads a field from the stream with the computed default value
      *
-     * @param fieldName the field to read
+     * @param fieldName    the field to read
      * @param defaultValue the supplier to compute a value if the field is missing in the object descriptor
      * @return the builder instance
      */
@@ -494,7 +495,7 @@ public class GetFieldBuilder<T> {
     /**
      * Reads a field from the stream with the computed default value
      *
-     * @param fieldName the field to read
+     * @param fieldName    the field to read
      * @param defaultValue the supplier to compute a value if the field is missing in the object descriptor
      * @return the builder instance
      */
@@ -509,7 +510,7 @@ public class GetFieldBuilder<T> {
      * Reads a field from the stream and transforms the value using the function
      *
      * @param fieldName the field to read
-     * @param function the function to transform the value
+     * @param function  the function to transform the value
      * @return the builder instance
      */
     public GetFieldBuilder<T> readTransformed(String fieldName, BooleanUnaryOperator function) {
@@ -522,7 +523,7 @@ public class GetFieldBuilder<T> {
      * Reads a field from the stream and transforms the value using the function
      *
      * @param fieldName the field to read
-     * @param function the function to transform the value
+     * @param function  the function to transform the value
      * @return the builder instance
      */
     public GetFieldBuilder<T> readTransformed(String fieldName, ByteUnaryOperator function) {
@@ -535,7 +536,7 @@ public class GetFieldBuilder<T> {
      * Reads a field from the stream and transforms the value using the function
      *
      * @param fieldName the field to read
-     * @param function the function to transform the value
+     * @param function  the function to transform the value
      * @return the builder instance
      */
     public GetFieldBuilder<T> readTransformed(String fieldName, CharUnaryOperator function) {
@@ -548,7 +549,7 @@ public class GetFieldBuilder<T> {
      * Reads a field from the stream and transforms the value using the function
      *
      * @param fieldName the field to read
-     * @param function the function to transform the value
+     * @param function  the function to transform the value
      * @return the builder instance
      */
     public GetFieldBuilder<T> readTransformed(String fieldName, ShortUnaryOperator function) {
@@ -561,7 +562,7 @@ public class GetFieldBuilder<T> {
      * Reads a field from the stream and transforms the value using the function
      *
      * @param fieldName the field to read
-     * @param function the function to transform the value
+     * @param function  the function to transform the value
      * @return the builder instance
      */
     public GetFieldBuilder<T> readTransformed(String fieldName, IntUnaryOperator function) {
@@ -574,7 +575,7 @@ public class GetFieldBuilder<T> {
      * Reads a field from the stream and transforms the value using the function
      *
      * @param fieldName the field to read
-     * @param function the function to transform the value
+     * @param function  the function to transform the value
      * @return the builder instance
      */
     public GetFieldBuilder<T> readTransformed(String fieldName, FloatUnaryOperator function) {
@@ -587,7 +588,7 @@ public class GetFieldBuilder<T> {
      * Reads a field from the stream and transforms the value using the function
      *
      * @param fieldName the field to read
-     * @param function the function to transform the value
+     * @param function  the function to transform the value
      * @return the builder instance
      */
     public GetFieldBuilder<T> readTransformed(String fieldName, LongUnaryOperator function) {
@@ -600,7 +601,7 @@ public class GetFieldBuilder<T> {
      * Reads a field from the stream and transforms the value using the function
      *
      * @param fieldName the field to read
-     * @param function the function to transform the value
+     * @param function  the function to transform the value
      * @return the builder instance
      */
     public GetFieldBuilder<T> readTransformed(String fieldName, DoubleUnaryOperator function) {
@@ -613,7 +614,7 @@ public class GetFieldBuilder<T> {
      * Reads a field from the stream and transforms the value using the function
      *
      * @param fieldName the field to read
-     * @param function the function to transform the value
+     * @param function  the function to transform the value
      * @param <V>       the target type of the transformation
      * @return the builder instance
      */
@@ -628,7 +629,7 @@ public class GetFieldBuilder<T> {
      * Reads a fixed value into the object
      *
      * @param fieldName the field to read
-     * @param function the supplier to compute a value
+     * @param function  the supplier to compute a value
      * @return the builder instance
      */
     public GetFieldBuilder<T> readComputed(String fieldName, BooleanSupplier function) {
@@ -639,7 +640,7 @@ public class GetFieldBuilder<T> {
      * Reads a fixed value into the object
      *
      * @param fieldName the field to read
-     * @param function the supplier to compute a value
+     * @param function  the supplier to compute a value
      * @return the builder instance
      */
     public GetFieldBuilder<T> readComputed(String fieldName, CharSupplier function) {
@@ -650,7 +651,7 @@ public class GetFieldBuilder<T> {
      * Reads a fixed value into the object
      *
      * @param fieldName the field to read
-     * @param function the supplier to compute a value
+     * @param function  the supplier to compute a value
      * @return the builder instance
      */
     public GetFieldBuilder<T> readComputed(String fieldName, ByteSupplier function) {
@@ -661,7 +662,7 @@ public class GetFieldBuilder<T> {
      * Reads a fixed value into the object
      *
      * @param fieldName the field to read
-     * @param function the supplier to compute a value
+     * @param function  the supplier to compute a value
      * @return the builder instance
      */
     public GetFieldBuilder<T> readComputed(String fieldName, ShortSupplier function) {
@@ -672,7 +673,7 @@ public class GetFieldBuilder<T> {
      * Reads a fixed value into the object
      *
      * @param fieldName the field to read
-     * @param function the supplier to compute a value
+     * @param function  the supplier to compute a value
      * @return the builder instance
      */
     public GetFieldBuilder<T> readComputed(String fieldName, IntSupplier function) {
@@ -683,7 +684,7 @@ public class GetFieldBuilder<T> {
      * Reads a fixed value into the object
      *
      * @param fieldName the field to read
-     * @param function the supplier to compute a value
+     * @param function  the supplier to compute a value
      * @return the builder instance
      */
     public GetFieldBuilder<T> readComputed(String fieldName, FloatSupplier function) {
@@ -694,7 +695,7 @@ public class GetFieldBuilder<T> {
      * Reads a fixed value into the object
      *
      * @param fieldName the field to read
-     * @param function the supplier to compute a value
+     * @param function  the supplier to compute a value
      * @return the builder instance
      */
     public GetFieldBuilder<T> readComputed(String fieldName, LongSupplier function) {
@@ -705,7 +706,7 @@ public class GetFieldBuilder<T> {
      * Reads a fixed value into the object
      *
      * @param fieldName the field to read
-     * @param function the supplier to compute a value
+     * @param function  the supplier to compute a value
      * @return the builder instance
      */
     public GetFieldBuilder<T> readComputed(String fieldName, DoubleSupplier function) {
@@ -716,7 +717,7 @@ public class GetFieldBuilder<T> {
      * Reads a fixed value into the object
      *
      * @param fieldName the field to read
-     * @param function the supplier to compute a value
+     * @param function  the supplier to compute a value
      * @return the builder instance
      */
     public GetFieldBuilder<T> readComputed(String fieldName, Supplier<Object> function) {
@@ -729,7 +730,7 @@ public class GetFieldBuilder<T> {
      * Reads a value from the custom function into the object
      *
      * @param fieldName the field to read
-     * @param function a custom function to read and transform a value from {@code GetField}
+     * @param function  a custom function to read and transform a value from {@code GetField}
      * @return the builder instance
      */
     public GetFieldBuilder<T> readComputed(String fieldName,

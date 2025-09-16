@@ -63,6 +63,7 @@ public interface FieldModifierTransformerLogger {
         /**
          * Default implementation for changes of visibility modifiers using JUL (java.util.logging)
          */
+        @SuppressWarnings("ClassCanBeRecord") // logger should not have public accessor
         class DefaultJUL implements FieldModifierTransformerLogger {
 
             /**

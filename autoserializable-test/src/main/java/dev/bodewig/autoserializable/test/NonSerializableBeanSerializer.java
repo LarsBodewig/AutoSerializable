@@ -6,6 +6,7 @@ import dev.bodewig.autoserializable.api.AutoSerializer;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+@SuppressWarnings("ClassEscapesDefinedScope")
 @AutoSerializable(NonSerializableBean.class)
 public class NonSerializableBeanSerializer extends AutoSerializer<NonSerializableBean> {
 
