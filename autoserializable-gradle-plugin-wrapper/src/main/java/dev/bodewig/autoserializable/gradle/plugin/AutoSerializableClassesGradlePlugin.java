@@ -1,5 +1,7 @@
 package dev.bodewig.autoserializable.gradle.plugin;
 
+import dev.bodewig.autoserializable.gradle.plugin.output.AutoSerializableClassesOutput;
+import dev.bodewig.autoserializable.gradle.plugin.output.JavaClassesOutput;
 import dev.bodewig.autoserializable.gradle.plugin.task.AutoSerializableClassesTask;
 import dev.bodewig.autoserializable.gradle.plugin.task.AutoSerializableJarsTask;
 import dev.bodewig.autoserializable.gradle.plugin.task.PreAssembleJarTask;
@@ -51,9 +53,19 @@ public class AutoSerializableClassesGradlePlugin implements Plugin<Project> {
     public void apply(Project project) {
         project.getPlugins().apply(JavaPlugin.class);
 
+        // register extensions for task output
+        JavaClassesOutput javaClassesOutput = project.getExtensions().findByType(JavaClassesOutput.class) != null ?
+                project.getExtensions().getByType(JavaClassesOutput.class) :
+                project.getExtensions().create(JavaClassesOutput.NAME, JavaClassesOutput.class);
+        AutoSerializableClassesOutput autoSerializableClassesOutput =
+                project.getExtensions().create(AutoSerializableClassesOutput.NAME, AutoSerializableClassesOutput.class);
+
         // run non private task before compiling
         TaskProvider<JavaCompile> compileTask =
                 project.getTasks().named(JavaPlugin.COMPILE_JAVA_TASK_NAME, JavaCompile.class);
+
+        compileTask.configure(task -> task.doLast(t ->
+            javaClassesOutput.getClassFiles().addAll(t.getOutputs().getFiles().getAsFileTree())));
 
         // create jar from compiled classes to reference on autoSerializable classpath
         PreAssembleJarTask preAssembleJarTask =
@@ -84,6 +96,7 @@ public class AutoSerializableClassesGradlePlugin implements Plugin<Project> {
                     task.dependsOn(preAssembleJarTask);
                     // order tasks if both plugins are used
                     task.mustRunAfter(project.getTasks().withType(AutoSerializableJarsTask.class));
+                    autoSerializableClassesOutput.getClassFiles().addAll(compiledDir.getAsFileTree().getFiles());
                 });
 
         // add autoserializable-api to api configuration

@@ -1,5 +1,7 @@
 package dev.bodewig.autoserializable.gradle.plugin;
 
+import dev.bodewig.autoserializable.gradle.plugin.output.AutoSerializableJarsOutput;
+import dev.bodewig.autoserializable.gradle.plugin.output.JavaClassesOutput;
 import dev.bodewig.autoserializable.gradle.plugin.task.AutoSerializableJarsTask;
 import dev.bodewig.autoserializable.gradle.plugin.task.NonPrivateTask;
 import dev.bodewig.autoserializable.gradle.plugin.task.PreAssembleJarTask;
@@ -64,6 +66,13 @@ public class AutoSerializableJarsGradlePlugin implements Plugin<Project> {
     public void apply(Project project) {
         project.getPlugins().apply(JavaPlugin.class);
 
+        // register extensions for task output
+        JavaClassesOutput javaClassesOutput = project.getExtensions().findByType(JavaClassesOutput.class) != null ?
+                project.getExtensions().getByType(JavaClassesOutput.class) :
+                project.getExtensions().create(JavaClassesOutput.NAME, JavaClassesOutput.class);
+        AutoSerializableJarsOutput autoSerializableJarsOutput =
+                project.getExtensions().create(AutoSerializableJarsOutput.NAME, AutoSerializableJarsOutput.class);
+
         // create configuration to register dependencies to transform
         Configuration autoSerializableConfig =
                 project.getConfigurations().maybeCreate(AUTO_SERIALIZABLE_CONFIGURATION_NAME);
@@ -96,9 +105,12 @@ public class AutoSerializableJarsGradlePlugin implements Plugin<Project> {
 
         // run non private task before compiling
         TaskProvider<JavaCompile> compileTask =
-                project.getTasks().named(JavaPlugin.COMPILE_JAVA_TASK_NAME, JavaCompile.class, task -> {
-                    task.dependsOn(nonPrivateTask);
-                });
+                project.getTasks().named(JavaPlugin.COMPILE_JAVA_TASK_NAME, JavaCompile.class);
+
+        compileTask.configure(task -> {
+            task.dependsOn(nonPrivateTask);
+            task.doLast(t -> javaClassesOutput.getClassFiles().addAll(t.getOutputs().getFiles().getAsFileTree()));
+        });
 
         // create jar from compiled classes to reference on autoSerializable classpath
         TaskProvider<PreAssembleJarTask> preAssembleJarTask =
@@ -126,6 +138,7 @@ public class AutoSerializableJarsGradlePlugin implements Plugin<Project> {
                     task.setSource(pulledDir.getAsFile());
                     task.setClassPath(serializersConfig);
                     task.dependsOn(preAssembleJarTask);
+                    autoSerializableJarsOutput.getJarFiles().addAll(pulledDir.getAsFileTree().getFiles());
                 });
 
         // add autoserializable jars and the autoserializable-api to api configuration
