@@ -5,21 +5,31 @@ import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
 import net.bytebuddy.build.Plugin;
 import net.bytebuddy.description.annotation.AnnotationDescription;
+import net.bytebuddy.description.field.FieldDescription;
 import net.bytebuddy.description.modifier.FieldManifestation;
 import net.bytebuddy.description.modifier.Ownership;
 import net.bytebuddy.description.modifier.Visibility;
+import net.bytebuddy.description.type.TypeDefinition;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.ClassFileLocator;
 import net.bytebuddy.dynamic.DynamicType;
+import net.bytebuddy.implementation.Implementation;
 import net.bytebuddy.implementation.MethodCall;
+import net.bytebuddy.implementation.bytecode.Duplication;
+import net.bytebuddy.implementation.bytecode.StackManipulation;
+import net.bytebuddy.implementation.bytecode.TypeCreation;
+import net.bytebuddy.implementation.bytecode.collection.ArrayFactory;
+import net.bytebuddy.implementation.bytecode.constant.ClassConstant;
+import net.bytebuddy.implementation.bytecode.constant.TextConstant;
+import net.bytebuddy.implementation.bytecode.member.FieldAccess;
+import net.bytebuddy.implementation.bytecode.member.MethodInvocation;
+import net.bytebuddy.implementation.bytecode.member.MethodReturn;
 import net.bytebuddy.jar.asm.Opcodes;
 
 import java.io.*;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -130,19 +140,61 @@ public class AutoSerializablePlugin extends NonPrivatePlugin implements Plugin.W
 
         // find annotated AutoSerializer or use DefaultSerializer
         TypeDescription serializer = TypeDescription.ForLoadedType.of(AutoSerializer.class);
+        List<StackManipulation> initializer = new ArrayList<>();
         if (typeToSerializer.containsKey(typeDescription)) {
             serializer = typeToSerializer.get(typeDescription);
             logger.info("Injected custom serializer " + serializer.getName() + " into " + typeDescription.getName());
+
+            if (serializer.getDeclaredAnnotations().isAnnotationPresent(SerialPersistentFields.class)) {
+                AnnotationDescription.Loadable<SerialPersistentFields> annotation =
+                        serializer.getDeclaredAnnotations().ofType(SerialPersistentFields.class);
+                String[] annotationValues = annotation.getValue("value").resolve(String[].class);
+                TypeDescription osfType = TypeDescription.ForLoadedType.of(ObjectStreamField.class);
+                Map<String, TypeDescription> serialPersistentFields = Arrays.stream(annotationValues).collect(
+                        Collectors.toMap(Function.identity(), name -> typeDescription.getDeclaredFields().stream()
+                                .filter(field -> field.getName().equals(name))
+                                .map(FieldDescription.InDefinedShape::getType).map(TypeDefinition::asErasure).findAny()
+                                .orElseThrow(() -> new RuntimeException(new NoSuchFieldException(name)))));
+                List<StackManipulation.Compound> osfValues = serialPersistentFields.entrySet().stream()
+                        .map(entry -> new StackManipulation.Compound(TypeCreation.of(osfType), Duplication.SINGLE,
+                                new TextConstant(entry.getKey()), ClassConstant.of(entry.getValue()),
+                                MethodInvocation.invoke(osfType.getDeclaredMethods()
+                                        .filter(isConstructor().and(takesArguments(String.class, Class.class)))
+                                        .getOnly()))).toList();
+
+                // private static final ObjectStreamField[] serialPersistentFields;
+                builder = builder.defineField(SerialPersistentFields.FIELD_NAME,
+                        TypeDescription.ForLoadedType.of(ObjectStreamField[].class), Visibility.PRIVATE,
+                        Ownership.STATIC, FieldManifestation.FINAL);
+
+                // serialPersistentFields = new ObjectStreamField[]{ new ObjectStreamField(...), ... };
+                StackManipulation osfInitializer = new StackManipulation.Compound(
+                        ArrayFactory.forType(osfType.asGenericType()).withValues(osfValues), FieldAccess.forField(
+                        builder.toTypeDescription().getDeclaredFields().filter(named(SerialPersistentFields.FIELD_NAME))
+                                .getOnly()).write());
+                initializer.add(osfInitializer);
+
+                logger.info("Added serialPersistentFields " + Arrays.toString(annotationValues) + " to " +
+                        typeDescription.getName());
+            }
         }
 
         // private static final AutoSerializer _serializer;
         builder = builder.defineField(AutoSerializer.FIELD_NAME, TypeDescription.ForLoadedType.of(AutoSerializer.class),
                 Visibility.PRIVATE, Ownership.STATIC, FieldManifestation.FINAL);
 
-        // static { _serializer = new <serializer>(); }
-        builder = builder.invokable(isTypeInitializer()).intercept(
-                MethodCall.construct(serializer.getDeclaredMethods().filter(isDefaultConstructor()).getOnly())
-                        .setsField(named(AutoSerializer.FIELD_NAME)));
+        // _serializer = new <serializer>();
+        StackManipulation serializerInit =
+                new StackManipulation.Compound(TypeCreation.of(serializer), Duplication.SINGLE, MethodInvocation.invoke(
+                        serializer.getDeclaredMethods().filter(isConstructor().and(takesArguments(0))).getOnly()),
+                        FieldAccess.forField(
+                                builder.toTypeDescription().getDeclaredFields().filter(named(AutoSerializer.FIELD_NAME))
+                                        .getOnly()).write());
+        initializer.add(serializerInit);
+        initializer.add(MethodReturn.VOID);
+
+        builder = builder.invokable(isTypeInitializer())
+                .intercept(new Implementation.Simple(new StackManipulation.Compound(initializer)));
 
         // private void writeObject(java.io.ObjectOutputStream out) throws IOException {
         //     _serializer.writeObject(out, this);

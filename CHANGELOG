@@ -2,6 +2,7 @@
 
 * Added PutFieldBuilder and GetFieldBuilder to create custom Serializers
 * Return instance from TestFactory
+* Added SerialPersistentFields annotation to create constant on AutoSerialized class
 
 
 # v2.0.2
