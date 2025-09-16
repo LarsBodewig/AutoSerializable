@@ -2,6 +2,9 @@ package dev.bodewig.autoserializable.api.function;
 
 import java.util.Objects;
 
+/**
+ * @see java.util.function.UnaryOperator
+ */
 @SuppressWarnings("unused")
 @FunctionalInterface
 public interface CharUnaryOperator {

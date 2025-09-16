@@ -11,6 +11,11 @@ import java.util.function.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+/**
+ * Immutable builder for {@link java.io.ObjectOutputStream.PutField}
+ *
+ * @param <T> the type to serialize
+ */
 @SuppressWarnings("unused")
 public class PutFieldBuilder<T> {
 
@@ -19,6 +24,10 @@ public class PutFieldBuilder<T> {
     private final T object;
     private final Map<String, ObjectStreamField> serializedFields;
 
+    /**
+     * Internal constructor to initialize the fields
+     * @param object the instance to serialize
+     */
     protected PutFieldBuilder(T object) {
         this.putOperations = new TreeMap<>();
         this.object = object;
@@ -31,14 +40,32 @@ public class PutFieldBuilder<T> {
                 .collect(Collectors.toMap(ObjectStreamField::getName, Function.identity()));
     }
 
+    /**
+     * Creates a new {@code PutFieldBuilder} for the supplied instance
+     *
+     * @param object the instance to serialize
+     * @return the builder instance
+     * @param <T> the type of the instance
+     */
     public static <T> PutFieldBuilder<T> of(T object) {
         return new PutFieldBuilder<>(object);
     }
 
+    /**
+     * Writes all fields from the object descriptor to the stream
+     *
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> all() {
         return with(serializedFields.keySet().toArray(new String[0]));
     }
 
+    /**
+     * Writes the fields to the stream
+     *
+     * @param fieldNames the fields to write
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> with(String... fieldNames) {
         for (String fieldName : fieldNames) {
             try {
@@ -75,8 +102,14 @@ public class PutFieldBuilder<T> {
         return this;
     }
 
-    public PutFieldBuilder<T> without(String... names) {
-        for (String name : names) {
+    /**
+     * Skips the fields from being written
+     *
+     * @param fieldNames the fields to skip
+     * @return the builder instance
+     */
+    public PutFieldBuilder<T> without(String... fieldNames) {
+        for (String name : fieldNames) {
             if (!serializedFields.containsKey(name)) {
                 throw new FieldBuilderException(new NoSuchFieldException(name));
             }
@@ -85,6 +118,13 @@ public class PutFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Writes a fixed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param value the value to write
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> put(String fieldName, boolean value) {
         assertFieldInDescriptor(fieldName);
         if (!serializedFields.get(fieldName).getType().isPrimitive()) {
@@ -94,6 +134,13 @@ public class PutFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Writes a fixed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param value the value to write
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> put(String fieldName, byte value) {
         assertFieldInDescriptor(fieldName);
         if (!serializedFields.get(fieldName).getType().isPrimitive()) {
@@ -103,6 +150,13 @@ public class PutFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Writes a fixed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param value the value to write
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> put(String fieldName, char value) {
         assertFieldInDescriptor(fieldName);
         if (!serializedFields.get(fieldName).getType().isPrimitive()) {
@@ -112,6 +166,13 @@ public class PutFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Writes a fixed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param value the value to write
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> put(String fieldName, short value) {
         assertFieldInDescriptor(fieldName);
         if (!serializedFields.get(fieldName).getType().isPrimitive()) {
@@ -121,6 +182,13 @@ public class PutFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Writes a fixed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param value the value to write
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> put(String fieldName, int value) {
         assertFieldInDescriptor(fieldName);
         if (!serializedFields.get(fieldName).getType().isPrimitive()) {
@@ -130,6 +198,13 @@ public class PutFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Writes a fixed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param value the value to write
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> put(String fieldName, float value) {
         assertFieldInDescriptor(fieldName);
         if (!serializedFields.get(fieldName).getType().isPrimitive()) {
@@ -139,6 +214,13 @@ public class PutFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Writes a fixed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param value the value to write
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> put(String fieldName, long value) {
         assertFieldInDescriptor(fieldName);
         if (!serializedFields.get(fieldName).getType().isPrimitive()) {
@@ -148,6 +230,13 @@ public class PutFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Writes a fixed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param value the value to write
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> put(String fieldName, double value) {
         assertFieldInDescriptor(fieldName);
         if (!serializedFields.get(fieldName).getType().isPrimitive()) {
@@ -157,12 +246,26 @@ public class PutFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Writes a fixed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param value the value to write
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> put(String fieldName, Object value) {
         assertFieldInDescriptor(fieldName);
         putOperations.put(fieldName, pf -> pf.put(fieldName, value));
         return this;
     }
 
+    /**
+     * Writes a fixed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param function the supplier to compute a value
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> putComputed(String fieldName, BooleanSupplier function) {
         assertFieldInDescriptor(fieldName);
         if (!serializedFields.get(fieldName).getType().isPrimitive()) {
@@ -172,6 +275,13 @@ public class PutFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Writes a fixed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param function the supplier to compute a value
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> putComputed(String fieldName, CharSupplier function) {
         assertFieldInDescriptor(fieldName);
         if (!serializedFields.get(fieldName).getType().isPrimitive()) {
@@ -181,6 +291,13 @@ public class PutFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Writes a fixed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param function the supplier to compute a value
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> putComputed(String fieldName, ByteSupplier function) {
         assertFieldInDescriptor(fieldName);
         if (!serializedFields.get(fieldName).getType().isPrimitive()) {
@@ -190,6 +307,13 @@ public class PutFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Writes a fixed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param function the supplier to compute a value
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> putComputed(String fieldName, ShortSupplier function) {
         assertFieldInDescriptor(fieldName);
         if (!serializedFields.get(fieldName).getType().isPrimitive()) {
@@ -199,6 +323,13 @@ public class PutFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Writes a fixed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param function the supplier to compute a value
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> putComputed(String fieldName, IntSupplier function) {
         assertFieldInDescriptor(fieldName);
         if (!serializedFields.get(fieldName).getType().isPrimitive()) {
@@ -208,6 +339,13 @@ public class PutFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Writes a fixed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param function the supplier to compute a value
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> putComputed(String fieldName, FloatSupplier function) {
         assertFieldInDescriptor(fieldName);
         if (!serializedFields.get(fieldName).getType().isPrimitive()) {
@@ -217,6 +355,13 @@ public class PutFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Writes a fixed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param function the supplier to compute a value
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> putComputed(String fieldName, LongSupplier function) {
         assertFieldInDescriptor(fieldName);
         if (!serializedFields.get(fieldName).getType().isPrimitive()) {
@@ -226,6 +371,13 @@ public class PutFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Writes a fixed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param function the supplier to compute a value
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> putComputed(String fieldName, DoubleSupplier function) {
         assertFieldInDescriptor(fieldName);
         if (!serializedFields.get(fieldName).getType().isPrimitive()) {
@@ -235,72 +387,154 @@ public class PutFieldBuilder<T> {
         return this;
     }
 
+    /**
+     * Writes a fixed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param function the supplier to compute a value
+     * @return the builder instance
+     */
     public <V> PutFieldBuilder<T> putComputed(String fieldName, Supplier<V> function) {
         assertFieldInDescriptor(fieldName);
         putOperations.put(fieldName, pf -> pf.put(fieldName, function.get()));
         return this;
     }
 
+    /**
+     * Writes a fixed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param function the supplier to compute a value
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> putComputed(String fieldName, Consumer<ObjectOutputStream.PutField> function) {
         assertFieldInDescriptor(fieldName);
         putOperations.put(fieldName, function);
         return this;
     }
 
+    /**
+     * Writes a transformed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param function the function to transform the value
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> putTransformed(String fieldName, BooleanUnaryOperator function) {
         boolean value = getFieldValue(fieldName);
         putOperations.put(fieldName, pf -> pf.put(fieldName, function.applyAsBoolean(value)));
         return this;
     }
 
+    /**
+     * Writes a transformed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param function the function to transform the value
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> putTransformed(String fieldName, CharUnaryOperator function) {
         char value = getFieldValue(fieldName);
         putOperations.put(fieldName, pf -> pf.put(fieldName, function.applyAsChar(value)));
         return this;
     }
 
+    /**
+     * Writes a transformed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param function the function to transform the value
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> putTransformed(String fieldName, ByteUnaryOperator function) {
         byte value = getFieldValue(fieldName);
         putOperations.put(fieldName, pf -> pf.put(fieldName, function.applyAsByte(value)));
         return this;
     }
 
+    /**
+     * Writes a transformed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param function the function to transform the value
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> putTransformed(String fieldName, ShortUnaryOperator function) {
         short value = getFieldValue(fieldName);
         putOperations.put(fieldName, pf -> pf.put(fieldName, function.applyAsShort(value)));
         return this;
     }
 
+    /**
+     * Writes a transformed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param function the function to transform the value
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> putTransformed(String fieldName, IntUnaryOperator function) {
         int value = getFieldValue(fieldName);
         putOperations.put(fieldName, pf -> pf.put(fieldName, function.applyAsInt(value)));
         return this;
     }
 
+    /**
+     * Writes a transformed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param function the function to transform the value
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> putTransformed(String fieldName, FloatUnaryOperator function) {
         float value = getFieldValue(fieldName);
         putOperations.put(fieldName, pf -> pf.put(fieldName, function.applyAsFloat(value)));
         return this;
     }
 
+    /**
+     * Writes a transformed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param function the function to transform the value
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> putTransformed(String fieldName, LongUnaryOperator function) {
         long value = getFieldValue(fieldName);
         putOperations.put(fieldName, pf -> pf.put(fieldName, function.applyAsLong(value)));
         return this;
     }
 
+    /**
+     * Writes a transformed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param function the function to transform the value
+     * @return the builder instance
+     */
     public PutFieldBuilder<T> putTransformed(String fieldName, DoubleUnaryOperator function) {
         double value = getFieldValue(fieldName);
         putOperations.put(fieldName, pf -> pf.put(fieldName, function.applyAsDouble(value)));
         return this;
     }
 
+    /**
+     * Writes a transformed value into the stream
+     *
+     * @param fieldName the field to write
+     * @param function the function to transform the value
+     * @return the builder instance
+     */
     public <V> PutFieldBuilder<T> putTransformed(String fieldName, UnaryOperator<V> function) {
         V value = getFieldValue(fieldName);
         putOperations.put(fieldName, pf -> pf.put(fieldName, function.apply(value)));
         return this;
     }
 
+    /**
+     * Applies the builder by writing the values to the stream
+     *
+     * @param out the stream to write to
+     */
     public void writeFields(ObjectOutputStream out) {
         try {
             ObjectOutputStream.PutField putField = out.putFields();
