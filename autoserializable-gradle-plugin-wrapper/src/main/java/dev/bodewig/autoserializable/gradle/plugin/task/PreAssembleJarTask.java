@@ -17,6 +17,7 @@ public class PreAssembleJarTask extends Jar {
      * The default name of the task
      */
     public static final String TASK_NAME = "preAssembleJar";
+
     /**
      * The default name of the output directory
      */

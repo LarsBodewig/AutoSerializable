@@ -1,3 +1,4 @@
+//file:noinspection GrUnresolvedAccess
 pluginManagement {
     rootProject.name = "$artifactId"
 

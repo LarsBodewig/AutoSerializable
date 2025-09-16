@@ -1,3 +1,4 @@
+//file:noinspection GrUnresolvedAccess
 buildscript {
     group = "$groupId"
 }
@@ -36,6 +37,7 @@ tasks.withType(Javadoc) {
 }
 
 gradlePlugin {
+    //noinspection GroovyAssignabilityCheck
     plugins {
         autoSerializableClasses {
             id = 'dev.bodewig.autoserializable.classes'
@@ -57,8 +59,6 @@ publishing.publications.withType(MavenPublication) { pub ->
         parent.appendNode('groupId', "$group")
         parent.appendNode('artifactId', 'autoserializable-parent')
         parent.appendNode('version', "$version")
-        //pom.remove(pom.get('groupId'))
-        pom.remove(pom.get('version'))
         pom.appendNode('name', 'AutoSerializable gradle plugin')
         pom.appendNode('description', 'Adds a configuration to make dependencies serializable')
     }

@@ -30,18 +30,22 @@ public class AutoSerializableJarsGradlePlugin implements Plugin<Project> {
      * The name of the configuration used for jars to transform with byte-buddy
      */
     public static final String AUTO_SERIALIZABLE_CONFIGURATION_NAME = "autoSerializable";
+
     /**
      * The name of the configuration used for custom serializer compilation
      */
     public static final String NON_PRIVATE_CONFIGURATION_NAME = "nonPrivateConfig";
+
     /**
      * The name of the configuration used as classpath for the byte-buddy gradle plugin
      */
     public static final String SERIALIZERS_CONFIGURATION_NAME = "autoSerializers";
+
     /**
      * The name of the configuration used to add api dependencies
      */
     public static final String API_DEPENDENCIES_CONFIGURATION_NAME = "autoserializableDeps";
+
     /**
      * The name of the configuration used to add test dependencies
      */
@@ -78,10 +82,9 @@ public class AutoSerializableJarsGradlePlugin implements Plugin<Project> {
                 project.getConfigurations().maybeCreate(AUTO_SERIALIZABLE_CONFIGURATION_NAME);
 
         // create task to download registered dependencies
-        TaskProvider<PullJarsTask> pullJarsTask =
-                project.getTasks().register(PullJarsTask.TASK_NAME, PullJarsTask.class, task -> {
-                    task.setConfiguration(autoSerializableConfig);
-                });
+        TaskProvider<PullJarsTask> pullJarsTask = project.getTasks()
+                .register(PullJarsTask.TASK_NAME, PullJarsTask.class,
+                        task -> task.setConfiguration(autoSerializableConfig));
 
         // create task to make downloaded dependencies non private
         TaskProvider<NonPrivateTask> nonPrivateTask =
@@ -152,9 +155,8 @@ public class AutoSerializableJarsGradlePlugin implements Plugin<Project> {
                     project.getDependencies().create(project.fileTree(autoSerializableOutput, jarFilter()));
             dependencies.add(transformedDir);
         });
-        project.getConfigurations().getByName(JavaPlugin.API_CONFIGURATION_NAME, config -> {
-            config.extendsFrom(apiConfig);
-        });
+        project.getConfigurations()
+                .getByName(JavaPlugin.API_CONFIGURATION_NAME, config -> config.extendsFrom(apiConfig));
 
         // add autoserializable jars and autoserializable-junit to test configuration
         Configuration testConfig = project.getConfigurations().maybeCreate(TEST_CONFIGURATION_NAME);
@@ -166,16 +168,13 @@ public class AutoSerializableJarsGradlePlugin implements Plugin<Project> {
                     project.getDependencies().create(project.fileTree(autoSerializableOutput, jarFilter()));
             dependencies.add(transformedDir);
         });
-        project.getConfigurations().getByName(JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME, config -> {
-            config.extendsFrom(testConfig);
-        });
+        project.getConfigurations()
+                .getByName(JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME, config -> config.extendsFrom(testConfig));
 
         // run autoserializable task before compiling tests
-        project.getTasks().named(JavaPlugin.COMPILE_TEST_JAVA_TASK_NAME).configure(task -> {
-            task.dependsOn(autoSerializableJarsTask);
-        });
-        project.getTasks().named(JavaPlugin.CLASSES_TASK_NAME).configure(task -> {
-            task.dependsOn(autoSerializableJarsTask);
-        });
+        project.getTasks().named(JavaPlugin.COMPILE_TEST_JAVA_TASK_NAME)
+                .configure(task -> task.dependsOn(autoSerializableJarsTask));
+        project.getTasks().named(JavaPlugin.CLASSES_TASK_NAME)
+                .configure(task -> task.dependsOn(autoSerializableJarsTask));
     }
 }

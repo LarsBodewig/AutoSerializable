@@ -38,6 +38,7 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
 /**
  * A Byte-Buddy plugin to mark all classes and interfaces as Serializable.
  */
+@SuppressWarnings("NullableProblems")
 public class AutoSerializablePlugin extends NonPrivatePlugin implements Plugin.WithPreprocessor {
 
     private static final Logger logger = Logger.getLogger(AutoSerializablePlugin.class.getCanonicalName());
@@ -84,6 +85,7 @@ public class AutoSerializablePlugin extends NonPrivatePlugin implements Plugin.W
             logger.info("Scanning classpath for custom serializers");
             logger.fine("Classpath elements: " + Arrays.toString(classpathElements));
             try (ScanResult result = new ClassGraph().overrideClasspath(classpath).enableAnnotationInfo().scan()) {
+                @SuppressWarnings("unchecked") // unavoidable
                 List<TypeDescription> types =
                         result.getClassesWithAnyAnnotation(AutoSerializableAll.class, AutoSerializable.class)
                                 .loadClasses().stream().map(TypeDescription.ForLoadedType::of).toList();
@@ -148,6 +150,7 @@ public class AutoSerializablePlugin extends NonPrivatePlugin implements Plugin.W
             if (serializer.getDeclaredAnnotations().isAnnotationPresent(SerialPersistentFields.class)) {
                 AnnotationDescription.Loadable<SerialPersistentFields> annotation =
                         serializer.getDeclaredAnnotations().ofType(SerialPersistentFields.class);
+                assert annotation != null; // annotation value is not optional
                 String[] annotationValues = annotation.getValue("value").resolve(String[].class);
                 TypeDescription osfType = TypeDescription.ForLoadedType.of(ObjectStreamField.class);
                 Map<String, TypeDescription> serialPersistentFields = Arrays.stream(annotationValues).collect(
@@ -180,16 +183,16 @@ public class AutoSerializablePlugin extends NonPrivatePlugin implements Plugin.W
         }
 
         // private static final AutoSerializer _serializer;
-        builder = builder.defineField(AutoSerializer.FIELD_NAME, TypeDescription.ForLoadedType.of(AutoSerializer.class),
-                Visibility.PRIVATE, Ownership.STATIC, FieldManifestation.FINAL);
+        builder =
+                builder.defineField(AutoSerializable.FIELD_NAME, TypeDescription.ForLoadedType.of(AutoSerializer.class),
+                        Visibility.PRIVATE, Ownership.STATIC, FieldManifestation.FINAL);
 
         // _serializer = new <serializer>();
         StackManipulation serializerInit =
                 new StackManipulation.Compound(TypeCreation.of(serializer), Duplication.SINGLE, MethodInvocation.invoke(
                         serializer.getDeclaredMethods().filter(isConstructor().and(takesArguments(0))).getOnly()),
-                        FieldAccess.forField(
-                                builder.toTypeDescription().getDeclaredFields().filter(named(AutoSerializer.FIELD_NAME))
-                                        .getOnly()).write());
+                        FieldAccess.forField(builder.toTypeDescription().getDeclaredFields()
+                                .filter(named(AutoSerializable.FIELD_NAME)).getOnly()).write());
         initializer.add(serializerInit);
         initializer.add(MethodReturn.VOID);
 
@@ -205,7 +208,7 @@ public class AutoSerializablePlugin extends NonPrivatePlugin implements Plugin.W
                             MethodCall.invoke(
                                             AutoSerializer.class.getDeclaredMethod("writeObject",
                                                     ObjectOutputStream.class,
-                                                    Object.class)).onField(AutoSerializer.FIELD_NAME).withArgument(0)
+                                                    Object.class)).onField(AutoSerializable.FIELD_NAME).withArgument(0)
                                     .withThis());
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
@@ -220,7 +223,7 @@ public class AutoSerializablePlugin extends NonPrivatePlugin implements Plugin.W
                     .throwing(IOException.class, ClassNotFoundException.class).intercept(MethodCall.invoke(
                                     AutoSerializer.class.getDeclaredMethod("readObject", ObjectInputStream.class,
                                             Object.class))
-                            .onField(AutoSerializer.FIELD_NAME).withArgument(0).withThis());
+                            .onField(AutoSerializable.FIELD_NAME).withArgument(0).withThis());
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }

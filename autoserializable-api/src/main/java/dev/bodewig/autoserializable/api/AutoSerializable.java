@@ -17,6 +17,11 @@ import java.lang.annotation.*;
 public @interface AutoSerializable {
 
     /**
+     * The name used for the serializer field in the AutoSerialized class
+     */
+    String FIELD_NAME = "_serializer";
+
+    /**
      * The class to bind the annotated {@code AutoSerializer} to
      *
      * @return the class to bind the annotated {@code AutoSerializer} to

@@ -25,10 +25,12 @@ public class AutoSerializableClassesGradlePlugin implements Plugin<Project> {
      * The name of the configuration used as classpath for the byte-buddy gradle plugin
      */
     public static final String SERIALIZERS_CONFIGURATION_NAME = "autoSerializers";
+
     /**
      * The name of the configuration used to add api dependencies
      */
     public static final String API_DEPENDENCIES_CONFIGURATION_NAME = "autoserializableDeps";
+
     /**
      * The name of the configuration used to add test dependencies
      */
@@ -64,8 +66,8 @@ public class AutoSerializableClassesGradlePlugin implements Plugin<Project> {
         TaskProvider<JavaCompile> compileTask =
                 project.getTasks().named(JavaPlugin.COMPILE_JAVA_TASK_NAME, JavaCompile.class);
 
-        compileTask.configure(task -> task.doLast(t ->
-            javaClassesOutput.getClassFiles().addAll(t.getOutputs().getFiles().getAsFileTree())));
+        compileTask.configure(task -> task.doLast(
+                t -> javaClassesOutput.getClassFiles().addAll(t.getOutputs().getFiles().getAsFileTree())));
 
         // create jar from compiled classes to reference on autoSerializable classpath
         PreAssembleJarTask preAssembleJarTask =
@@ -105,25 +107,20 @@ public class AutoSerializableClassesGradlePlugin implements Plugin<Project> {
             Dependency autoserializableApi = AutoSerializableDependencies.autoserializableApi(project);
             dependencies.add(autoserializableApi);
         });
-        project.getConfigurations().getByName(JavaPlugin.API_CONFIGURATION_NAME, config -> {
-            config.extendsFrom(apiConfig);
-        });
+        project.getConfigurations()
+                .getByName(JavaPlugin.API_CONFIGURATION_NAME, config -> config.extendsFrom(apiConfig));
 
         // add autoserializable jars and autoserializable-junit to test configuration
         Configuration testConfig = project.getConfigurations().maybeCreate(TEST_CONFIGURATION_NAME);
-        testConfig.defaultDependencies(dependencies -> {
-            dependencies.add(AutoSerializableDependencies.autoserializableJunit(project));
-        });
-        project.getConfigurations().getByName(JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME, config -> {
-            config.extendsFrom(testConfig);
-        });
+        testConfig.defaultDependencies(
+                dependencies -> dependencies.add(AutoSerializableDependencies.autoserializableJunit(project)));
+        project.getConfigurations()
+                .getByName(JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME, config -> config.extendsFrom(testConfig));
 
         // run autoserializable task before compiling tests
-        project.getTasks().named(JavaPlugin.COMPILE_TEST_JAVA_TASK_NAME).configure(task -> {
-            task.dependsOn(autoSerializableClassesTask);
-        });
-        project.getTasks().named(JavaPlugin.CLASSES_TASK_NAME).configure(task -> {
-            task.dependsOn(autoSerializableClassesTask);
-        });
+        project.getTasks().named(JavaPlugin.COMPILE_TEST_JAVA_TASK_NAME)
+                .configure(task -> task.dependsOn(autoSerializableClassesTask));
+        project.getTasks().named(JavaPlugin.CLASSES_TASK_NAME)
+                .configure(task -> task.dependsOn(autoSerializableClassesTask));
     }
 }

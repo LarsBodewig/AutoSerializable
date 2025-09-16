@@ -1,10 +1,10 @@
 package dev.bodewig.autoserializable.api.function;
 
 /**
- * @see java.util.function.Function
  * @param <I> the type of the input to the function
  * @param <O> the type of the result of the function
  * @param <T> the type of the exception of the function
+ * @see java.util.function.Function
  */
 @FunctionalInterface
 public interface ThrowingFunction<I, O, T extends Throwable> {

@@ -19,10 +19,12 @@ public class AutoSerializableClassesTask extends ByteBuddySimpleTask {
      * The default name of the task
      */
     public static final String TASK_NAME = "autoSerializableClasses";
+
     /**
      * The default name of the output directory
      */
     public static final String MOVED_CLASSES_DIR_NAME = "movedClasses";
+
     private final Provider<Directory> movedDir;
     private Provider<Directory> inPlace;
 

@@ -26,6 +26,7 @@ public class PutFieldBuilder<T> {
 
     /**
      * Internal constructor to initialize the fields
+     *
      * @param object the instance to serialize
      */
     protected PutFieldBuilder(T object) {
@@ -44,8 +45,8 @@ public class PutFieldBuilder<T> {
      * Creates a new {@code PutFieldBuilder} for the supplied instance
      *
      * @param object the instance to serialize
+     * @param <T>    the type of the instance
      * @return the builder instance
-     * @param <T> the type of the instance
      */
     public static <T> PutFieldBuilder<T> of(T object) {
         return new PutFieldBuilder<>(object);
@@ -122,7 +123,7 @@ public class PutFieldBuilder<T> {
      * Writes a fixed value into the stream
      *
      * @param fieldName the field to write
-     * @param value the value to write
+     * @param value     the value to write
      * @return the builder instance
      */
     public PutFieldBuilder<T> put(String fieldName, boolean value) {
@@ -138,7 +139,7 @@ public class PutFieldBuilder<T> {
      * Writes a fixed value into the stream
      *
      * @param fieldName the field to write
-     * @param value the value to write
+     * @param value     the value to write
      * @return the builder instance
      */
     public PutFieldBuilder<T> put(String fieldName, byte value) {
@@ -154,7 +155,7 @@ public class PutFieldBuilder<T> {
      * Writes a fixed value into the stream
      *
      * @param fieldName the field to write
-     * @param value the value to write
+     * @param value     the value to write
      * @return the builder instance
      */
     public PutFieldBuilder<T> put(String fieldName, char value) {
@@ -170,7 +171,7 @@ public class PutFieldBuilder<T> {
      * Writes a fixed value into the stream
      *
      * @param fieldName the field to write
-     * @param value the value to write
+     * @param value     the value to write
      * @return the builder instance
      */
     public PutFieldBuilder<T> put(String fieldName, short value) {
@@ -186,7 +187,7 @@ public class PutFieldBuilder<T> {
      * Writes a fixed value into the stream
      *
      * @param fieldName the field to write
-     * @param value the value to write
+     * @param value     the value to write
      * @return the builder instance
      */
     public PutFieldBuilder<T> put(String fieldName, int value) {
@@ -202,7 +203,7 @@ public class PutFieldBuilder<T> {
      * Writes a fixed value into the stream
      *
      * @param fieldName the field to write
-     * @param value the value to write
+     * @param value     the value to write
      * @return the builder instance
      */
     public PutFieldBuilder<T> put(String fieldName, float value) {
@@ -218,7 +219,7 @@ public class PutFieldBuilder<T> {
      * Writes a fixed value into the stream
      *
      * @param fieldName the field to write
-     * @param value the value to write
+     * @param value     the value to write
      * @return the builder instance
      */
     public PutFieldBuilder<T> put(String fieldName, long value) {
@@ -234,7 +235,7 @@ public class PutFieldBuilder<T> {
      * Writes a fixed value into the stream
      *
      * @param fieldName the field to write
-     * @param value the value to write
+     * @param value     the value to write
      * @return the builder instance
      */
     public PutFieldBuilder<T> put(String fieldName, double value) {
@@ -250,7 +251,7 @@ public class PutFieldBuilder<T> {
      * Writes a fixed value into the stream
      *
      * @param fieldName the field to write
-     * @param value the value to write
+     * @param value     the value to write
      * @return the builder instance
      */
     public PutFieldBuilder<T> put(String fieldName, Object value) {
@@ -263,7 +264,7 @@ public class PutFieldBuilder<T> {
      * Writes a fixed value into the stream
      *
      * @param fieldName the field to write
-     * @param function the supplier to compute a value
+     * @param function  the supplier to compute a value
      * @return the builder instance
      */
     public PutFieldBuilder<T> putComputed(String fieldName, BooleanSupplier function) {
@@ -279,7 +280,7 @@ public class PutFieldBuilder<T> {
      * Writes a fixed value into the stream
      *
      * @param fieldName the field to write
-     * @param function the supplier to compute a value
+     * @param function  the supplier to compute a value
      * @return the builder instance
      */
     public PutFieldBuilder<T> putComputed(String fieldName, CharSupplier function) {
@@ -295,7 +296,7 @@ public class PutFieldBuilder<T> {
      * Writes a fixed value into the stream
      *
      * @param fieldName the field to write
-     * @param function the supplier to compute a value
+     * @param function  the supplier to compute a value
      * @return the builder instance
      */
     public PutFieldBuilder<T> putComputed(String fieldName, ByteSupplier function) {
@@ -311,7 +312,7 @@ public class PutFieldBuilder<T> {
      * Writes a fixed value into the stream
      *
      * @param fieldName the field to write
-     * @param function the supplier to compute a value
+     * @param function  the supplier to compute a value
      * @return the builder instance
      */
     public PutFieldBuilder<T> putComputed(String fieldName, ShortSupplier function) {
@@ -327,7 +328,7 @@ public class PutFieldBuilder<T> {
      * Writes a fixed value into the stream
      *
      * @param fieldName the field to write
-     * @param function the supplier to compute a value
+     * @param function  the supplier to compute a value
      * @return the builder instance
      */
     public PutFieldBuilder<T> putComputed(String fieldName, IntSupplier function) {
@@ -343,7 +344,7 @@ public class PutFieldBuilder<T> {
      * Writes a fixed value into the stream
      *
      * @param fieldName the field to write
-     * @param function the supplier to compute a value
+     * @param function  the supplier to compute a value
      * @return the builder instance
      */
     public PutFieldBuilder<T> putComputed(String fieldName, FloatSupplier function) {
@@ -359,7 +360,7 @@ public class PutFieldBuilder<T> {
      * Writes a fixed value into the stream
      *
      * @param fieldName the field to write
-     * @param function the supplier to compute a value
+     * @param function  the supplier to compute a value
      * @return the builder instance
      */
     public PutFieldBuilder<T> putComputed(String fieldName, LongSupplier function) {
@@ -375,7 +376,7 @@ public class PutFieldBuilder<T> {
      * Writes a fixed value into the stream
      *
      * @param fieldName the field to write
-     * @param function the supplier to compute a value
+     * @param function  the supplier to compute a value
      * @return the builder instance
      */
     public PutFieldBuilder<T> putComputed(String fieldName, DoubleSupplier function) {
@@ -391,7 +392,7 @@ public class PutFieldBuilder<T> {
      * Writes a fixed value into the stream
      *
      * @param fieldName the field to write
-     * @param function the supplier to compute a value
+     * @param function  the supplier to compute a value
      * @return the builder instance
      */
     public <V> PutFieldBuilder<T> putComputed(String fieldName, Supplier<V> function) {
@@ -404,7 +405,7 @@ public class PutFieldBuilder<T> {
      * Writes a fixed value into the stream
      *
      * @param fieldName the field to write
-     * @param function the supplier to compute a value
+     * @param function  the supplier to compute a value
      * @return the builder instance
      */
     public PutFieldBuilder<T> putComputed(String fieldName, Consumer<ObjectOutputStream.PutField> function) {
@@ -417,7 +418,7 @@ public class PutFieldBuilder<T> {
      * Writes a transformed value into the stream
      *
      * @param fieldName the field to write
-     * @param function the function to transform the value
+     * @param function  the function to transform the value
      * @return the builder instance
      */
     public PutFieldBuilder<T> putTransformed(String fieldName, BooleanUnaryOperator function) {
@@ -430,7 +431,7 @@ public class PutFieldBuilder<T> {
      * Writes a transformed value into the stream
      *
      * @param fieldName the field to write
-     * @param function the function to transform the value
+     * @param function  the function to transform the value
      * @return the builder instance
      */
     public PutFieldBuilder<T> putTransformed(String fieldName, CharUnaryOperator function) {
@@ -443,7 +444,7 @@ public class PutFieldBuilder<T> {
      * Writes a transformed value into the stream
      *
      * @param fieldName the field to write
-     * @param function the function to transform the value
+     * @param function  the function to transform the value
      * @return the builder instance
      */
     public PutFieldBuilder<T> putTransformed(String fieldName, ByteUnaryOperator function) {
@@ -456,7 +457,7 @@ public class PutFieldBuilder<T> {
      * Writes a transformed value into the stream
      *
      * @param fieldName the field to write
-     * @param function the function to transform the value
+     * @param function  the function to transform the value
      * @return the builder instance
      */
     public PutFieldBuilder<T> putTransformed(String fieldName, ShortUnaryOperator function) {
@@ -469,7 +470,7 @@ public class PutFieldBuilder<T> {
      * Writes a transformed value into the stream
      *
      * @param fieldName the field to write
-     * @param function the function to transform the value
+     * @param function  the function to transform the value
      * @return the builder instance
      */
     public PutFieldBuilder<T> putTransformed(String fieldName, IntUnaryOperator function) {
@@ -482,7 +483,7 @@ public class PutFieldBuilder<T> {
      * Writes a transformed value into the stream
      *
      * @param fieldName the field to write
-     * @param function the function to transform the value
+     * @param function  the function to transform the value
      * @return the builder instance
      */
     public PutFieldBuilder<T> putTransformed(String fieldName, FloatUnaryOperator function) {
@@ -495,7 +496,7 @@ public class PutFieldBuilder<T> {
      * Writes a transformed value into the stream
      *
      * @param fieldName the field to write
-     * @param function the function to transform the value
+     * @param function  the function to transform the value
      * @return the builder instance
      */
     public PutFieldBuilder<T> putTransformed(String fieldName, LongUnaryOperator function) {
@@ -508,7 +509,7 @@ public class PutFieldBuilder<T> {
      * Writes a transformed value into the stream
      *
      * @param fieldName the field to write
-     * @param function the function to transform the value
+     * @param function  the function to transform the value
      * @return the builder instance
      */
     public PutFieldBuilder<T> putTransformed(String fieldName, DoubleUnaryOperator function) {
@@ -521,7 +522,7 @@ public class PutFieldBuilder<T> {
      * Writes a transformed value into the stream
      *
      * @param fieldName the field to write
-     * @param function the function to transform the value
+     * @param function  the function to transform the value
      * @return the builder instance
      */
     public <V> PutFieldBuilder<T> putTransformed(String fieldName, UnaryOperator<V> function) {

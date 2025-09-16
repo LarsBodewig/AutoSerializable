@@ -36,10 +36,12 @@ public class AutoSerializableTestFactory {
      * The classes found during object construction
      */
     protected List<Class<?>> classes;
+
     /**
      * The custom serializers found during object construction
      */
     protected List<Class<?>> serializers;
+
     /**
      * A stream of DynamicTests to run
      */

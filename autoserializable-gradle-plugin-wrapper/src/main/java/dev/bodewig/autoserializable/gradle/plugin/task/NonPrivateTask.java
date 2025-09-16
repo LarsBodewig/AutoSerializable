@@ -17,6 +17,7 @@ public class NonPrivateTask extends ByteBuddyJarsTask {
      * The default name of the task
      */
     public static final String TASK_NAME = "byteBuddyNonPrivate";
+
     /**
      * The default name of the output directory
      */

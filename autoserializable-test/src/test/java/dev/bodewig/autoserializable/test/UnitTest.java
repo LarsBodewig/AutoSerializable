@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UnitTest {
 
+    @SuppressWarnings("DataFlowIssue")
     @Test
     void instance() {
         assertInstanceOf(Serializable.class, new TestBean(0));
@@ -40,7 +41,7 @@ class UnitTest {
     void data() throws IOException, ClassNotFoundException {
         byte[] data;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-             ObjectOutputStream oos = new ObjectOutputStream(baos);) {
+             ObjectOutputStream oos = new ObjectOutputStream(baos)) {
             oos.writeObject(new TestBean(1));
             oos.flush();
             data = baos.toByteArray();
@@ -54,6 +55,7 @@ class UnitTest {
         }
     }
 
+    @SuppressWarnings("JavaReflectionMemberAccess")
     @Test
     void wasInitalized() throws IllegalAccessException, NoSuchFieldException {
         Field f1 = NonSerializableBean.class.getDeclaredField("_serializer");
