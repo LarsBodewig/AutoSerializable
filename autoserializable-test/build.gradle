@@ -1,3 +1,14 @@
+import dev.bodewig.autoserializable.gradle.plugin.output.AutoSerializableClassesOutput
+import dev.bodewig.autoserializable.gradle.plugin.output.AutoSerializableJarsOutput
+import dev.bodewig.autoserializable.gradle.plugin.output.JavaClassesOutput
+
+buildscript {
+    dependencies {
+        classpath gradleApi()
+        classpath "dev.bodewig.autoserializable:autoserializable-gradle-plugin:$version"
+    }
+}
+
 plugins {
     id 'java-library'
     id 'dev.bodewig.autoserializable.jars' version "$version"
@@ -8,11 +19,37 @@ java {
     sourceCompatibility = JavaVersion.VERSION_21
 }
 
-tasks.named('test', Test) {
+def testOutput = tasks.register('testOutput') {
+    doFirst(() -> {
+        JavaClassesOutput javaClassesOutput = project.getExtensions().getByType(JavaClassesOutput.class);
+        Set<String> one = javaClassesOutput.getClassFiles().get();
+        System.out.println("\nJavaClassesOutput: " + one);
+        assert !one.isEmpty() : "JavaClassesOutput was empty";
+        AutoSerializableJarsOutput autoSerializableJarsOutput = project.getExtensions().getByType(AutoSerializableJarsOutput.class);
+        Set<String> two = autoSerializableJarsOutput.getJarFiles().get();
+        System.out.println("\nAutoSerializableJarsOutput: " + two);
+        assert !two.isEmpty() : "AutoSerializableJarsOutput was empty";
+        AutoSerializableClassesOutput autoSerializableClassesOutput = project.getExtensions().getByType(AutoSerializableClassesOutput.class);
+        Set<String> three = autoSerializableClassesOutput.getClassFiles().get();
+        System.out.println("\nAutoSerializableClassesOutput: " + three);
+        assert !three.isEmpty() : "AutoSerializableClassesOutput was empty";
+    })
+}
+
+def test = tasks.named('test', Test) {
     useJUnitPlatform()
     testLogging {
         events 'failed', 'skipped', 'passed'
     }
+}
+
+def testAll = tasks.register('testAll') {
+    dependsOn(test)
+    dependsOn(testOutput)
+}
+
+tasks.named('build') {
+    dependsOn(testAll)
 }
 
 dependencies {

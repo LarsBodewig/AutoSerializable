@@ -240,7 +240,7 @@
                                 <configuration>
                                     <executable>../gradlew</executable>
                                     <arguments>
-                                        <argument>test</argument>
+                                        <argument>testAll</argument>
                                         <argument>-Pversion=${project.version}</argument>
                                         <argument>--stacktrace</argument>
                                     </arguments>
