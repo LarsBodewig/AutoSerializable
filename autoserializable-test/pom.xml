@@ -30,7 +30,7 @@
         </dependency>
         <dependency>
             <groupId>dev.bodewig.autoserializable</groupId>
-            <artifactId>autoserializable-gradle-plugin-wrapper</artifactId>
+            <artifactId>autoserializable-gradle-plugin</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
