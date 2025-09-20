@@ -1,3 +1,8 @@
+# v2.1.1
+
+* Do not fail on empty source set
+
+
 # v2.1.0
 
 * Added PutFieldBuilder and GetFieldBuilder to create custom Serializers

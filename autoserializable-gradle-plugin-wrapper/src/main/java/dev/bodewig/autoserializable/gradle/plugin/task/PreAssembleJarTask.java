@@ -37,7 +37,7 @@ public class PreAssembleJarTask extends Jar {
      *
      * @return The classFiles
      */
-    @InputDirectory
+    @InputFiles
     @PathSensitive(PathSensitivity.RELATIVE)
     public Provider<Directory> getClassFiles() {
         return classFiles;
