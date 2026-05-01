@@ -1,11 +1,12 @@
 package dev.bodewig.autoserializable.gradle.plugin.task;
 
 import org.gradle.api.file.Directory;
-import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.provider.Provider;
-import org.gradle.api.tasks.*;
+import org.gradle.api.tasks.CacheableTask;
+import org.gradle.api.tasks.InputFiles;
+import org.gradle.api.tasks.PathSensitive;
+import org.gradle.api.tasks.PathSensitivity;
 import org.gradle.jvm.tasks.Jar;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Prematurely creates a jar file from the compiled classes to use during transformation
@@ -29,7 +30,7 @@ public class PreAssembleJarTask extends Jar {
      * Initializes the output directory with the default value
      */
     public PreAssembleJarTask() {
-        setDestinationDirectory(getProject().getLayout().getBuildDirectory().dir(PRE_ASSEMBLE_JAR_DIR_NAME));
+        forceDestinationDirectory(getProject().getLayout().getBuildDirectory().dir(PRE_ASSEMBLE_JAR_DIR_NAME));
     }
 
     /**
@@ -53,18 +54,12 @@ public class PreAssembleJarTask extends Jar {
         from(classFiles);
     }
 
-    @Override
-    @OutputDirectory
-    public @NotNull DirectoryProperty getDestinationDirectory() {
-        return super.getDestinationDirectory();
-    }
-
     /**
      * Overloaded setter for destinationDirectory with Provider&lt;Directory&gt;
      *
      * @param destinationDirectory The destinationDirectory Provider
      */
-    public void setDestinationDirectory(Provider<Directory> destinationDirectory) {
+    public void forceDestinationDirectory(Provider<Directory> destinationDirectory) {
         getDestinationDirectory().set(destinationDirectory);
     }
 }

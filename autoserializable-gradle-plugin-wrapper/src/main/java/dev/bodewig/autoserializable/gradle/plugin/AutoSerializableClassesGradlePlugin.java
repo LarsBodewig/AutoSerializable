@@ -1,7 +1,7 @@
 package dev.bodewig.autoserializable.gradle.plugin;
 
-import dev.bodewig.autoserializable.gradle.plugin.output.AutoSerializableClassesOutput;
-import dev.bodewig.autoserializable.gradle.plugin.output.JavaClassesOutput;
+import dev.bodewig.autoserializable.api.gradle.output.AutoSerializableClassesOutput;
+import dev.bodewig.autoserializable.api.gradle.output.JavaClassesOutput;
 import dev.bodewig.autoserializable.gradle.plugin.task.AutoSerializableClassesTask;
 import dev.bodewig.autoserializable.gradle.plugin.task.AutoSerializableJarsTask;
 import dev.bodewig.autoserializable.gradle.plugin.task.PreAssembleJarTask;
@@ -11,8 +11,10 @@ import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.file.ConfigurableFileTree;
+import org.gradle.api.file.Directory;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.compile.JavaCompile;
 
@@ -67,16 +69,17 @@ public class AutoSerializableClassesGradlePlugin implements Plugin<Project> {
                 project.getTasks().named(JavaPlugin.COMPILE_JAVA_TASK_NAME, JavaCompile.class);
 
         compileTask.configure(task -> task.doLast(
-                t -> javaClassesOutput.getClassFiles().addAll(t.getOutputs().getFiles().getAsFileTree())));
+                t -> javaClassesOutput.getClassFiles().addAll(t.getOutputs().getFiles().getAsFileTree().getFiles())));
 
         // create jar from compiled classes to reference on autoSerializable classpath
         PreAssembleJarTask preAssembleJarTask =
                 project.getTasks().maybeCreate(PreAssembleJarTask.TASK_NAME, PreAssembleJarTask.class);
-        preAssembleJarTask.setClassFiles(compileTask.get().getDestinationDirectory());
+        preAssembleJarTask.setClassFiles(compileTask.flatMap(JavaCompile::getDestinationDirectory));
         preAssembleJarTask.dependsOn(compileTask);
 
         // create configuration with compiled classes and non private libs to find serializers
-        Configuration serializersConfig = project.getConfigurations().maybeCreate(SERIALIZERS_CONFIGURATION_NAME);
+        Configuration serializersConfig =
+                project.getConfigurations().maybeCreate(SERIALIZERS_CONFIGURATION_NAME);
         serializersConfig.defaultDependencies(dependencies -> {
             DirectoryProperty preAssembleJarOutput = preAssembleJarTask.getDestinationDirectory();
             Dependency compiledClasses =
@@ -92,17 +95,20 @@ public class AutoSerializableClassesGradlePlugin implements Plugin<Project> {
         // create task to make downloaded dependencies serializable
         TaskProvider<AutoSerializableClassesTask> autoSerializableClassesTask = project.getTasks()
                 .register(AutoSerializableClassesTask.TASK_NAME, AutoSerializableClassesTask.class, task -> {
-                    DirectoryProperty compiledDir = compileTask.get().getDestinationDirectory();
+                    Provider<Directory> compiledDir = compileTask.flatMap(JavaCompile::getDestinationDirectory);
                     task.setInPlace(compiledDir);
                     task.setClassPath(serializersConfig);
                     task.dependsOn(preAssembleJarTask);
+                    task.dependsOn(project.getTasks().named(JavaPlugin.PROCESS_RESOURCES_TASK_NAME));
+                    task.dependsOn(project.getTasks().named(JavaPlugin.PROCESS_TEST_RESOURCES_TASK_NAME));
                     // order tasks if both plugins are used
                     task.mustRunAfter(project.getTasks().withType(AutoSerializableJarsTask.class));
-                    autoSerializableClassesOutput.getClassFiles().addAll(compiledDir.getAsFileTree().getFiles());
+                    autoSerializableClassesOutput.getClassFiles().addAll(compiledDir.get().getAsFileTree().getFiles());
                 });
 
         // add autoserializable-api to api configuration
-        Configuration apiConfig = project.getConfigurations().maybeCreate(API_DEPENDENCIES_CONFIGURATION_NAME);
+        Configuration apiConfig =
+                project.getConfigurations().maybeCreate(API_DEPENDENCIES_CONFIGURATION_NAME);
         apiConfig.defaultDependencies(dependencies -> {
             Dependency autoserializableApi = AutoSerializableDependencies.autoserializableApi(project);
             dependencies.add(autoserializableApi);
@@ -111,7 +117,8 @@ public class AutoSerializableClassesGradlePlugin implements Plugin<Project> {
                 .getByName(JavaPlugin.API_CONFIGURATION_NAME, config -> config.extendsFrom(apiConfig));
 
         // add autoserializable jars and autoserializable-junit to test configuration
-        Configuration testConfig = project.getConfigurations().maybeCreate(TEST_CONFIGURATION_NAME);
+        Configuration testConfig =
+                project.getConfigurations().maybeCreate(TEST_CONFIGURATION_NAME);
         testConfig.defaultDependencies(
                 dependencies -> dependencies.add(AutoSerializableDependencies.autoserializableJunit(project)));
         project.getConfigurations()

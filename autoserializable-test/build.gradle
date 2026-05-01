@@ -1,8 +1,8 @@
 //file:noinspection GrUnresolvedAccess
 //file:noinspection GroovyAssignabilityCheck
-import dev.bodewig.autoserializable.gradle.plugin.output.AutoSerializableClassesOutput
-import dev.bodewig.autoserializable.gradle.plugin.output.AutoSerializableJarsOutput
-import dev.bodewig.autoserializable.gradle.plugin.output.JavaClassesOutput
+import dev.bodewig.autoserializable.api.gradle.output.AutoSerializableClassesOutput
+import dev.bodewig.autoserializable.api.gradle.output.AutoSerializableJarsOutput
+import dev.bodewig.autoserializable.api.gradle.output.JavaClassesOutput
 
 buildscript {
     dependencies {
@@ -24,15 +24,15 @@ java {
 def testOutput = tasks.register('testOutput') {
     doFirst(() -> {
         JavaClassesOutput javaClassesOutput = project.getExtensions().getByType(JavaClassesOutput.class)
-        Set<String> one = javaClassesOutput.getClassFiles().get()
+        Set<String> one = javaClassesOutput.getClassFiles()
         System.out.println("\nJavaClassesOutput: " + one)
         assert !one.isEmpty(): "JavaClassesOutput was empty"
         AutoSerializableJarsOutput autoSerializableJarsOutput = project.getExtensions().getByType(AutoSerializableJarsOutput.class)
-        Set<String> two = autoSerializableJarsOutput.getJarFiles().get()
+        Set<String> two = autoSerializableJarsOutput.getJarFiles()
         System.out.println("\nAutoSerializableJarsOutput: " + two)
         assert !two.isEmpty(): "AutoSerializableJarsOutput was empty"
         AutoSerializableClassesOutput autoSerializableClassesOutput = project.getExtensions().getByType(AutoSerializableClassesOutput.class)
-        Set<String> three = autoSerializableClassesOutput.getClassFiles().get()
+        Set<String> three = autoSerializableClassesOutput.getClassFiles()
         System.out.println("\nAutoSerializableClassesOutput: " + three)
         assert !three.isEmpty(): "AutoSerializableClassesOutput was empty"
     })
