@@ -34,8 +34,6 @@
         <dependency>
             <groupId>dev.gradleplugins</groupId>
             <artifactId>gradle-api</artifactId>
-            <version>8.5</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>dev.bodewig.autoserializable</groupId>

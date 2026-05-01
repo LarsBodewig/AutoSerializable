@@ -61,7 +61,7 @@ public class PullJarsTask extends Copy {
      * @param configuration The configuration
      */
     public void setConfiguration(Configuration configuration) {
-        this.configuration = configuration.getFiles();
+        this.configuration = configuration.isCanBeResolved() ? configuration.resolve() : configuration.getFiles();
         from(configuration);
     }
 

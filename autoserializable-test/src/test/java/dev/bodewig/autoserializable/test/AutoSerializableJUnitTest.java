@@ -17,7 +17,7 @@ class AutoSerializableJUnitTest {
         List<URI> sources;
         try (ScanResult scanResult = new ClassGraph().ignoreClassVisibility().filterClasspathElements(
                 path -> path.endsWith("/autoserializable-test/target/classes") ||
-                        path.endsWith("/build/classes/java/main") || path.contains("/build/transformedJars")).scan()) {
+                        path.endsWith("/build/classes/java/main") || path.contains("/build/autoSerializableJars")).scan()) {
             sources = scanResult.getClasspathURIs();
         }
         return new AutoSerializableTestFactory(sources).testAllClassesImplementSerializable().testSerializersAnnotated()
