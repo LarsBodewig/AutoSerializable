@@ -1,0 +1,35 @@
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+
+multi-ecosystem-groups:
+  java:
+    schedule:
+      interval: "monthly"
+    cooldown:
+      default-days: 7
+      semver-major-days: 21
+
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "maven"
+    directory: "/"
+    multi-ecosystem-group: "java"
+
+  - package-ecosystem: "gradle"
+    directory: "/autoserializable-gradle-plugin-wrapper"
+    multi-ecosystem-group: "java"
+
+  - package-ecosystem: "gradle"
+    directory: "/autoserializable-test"
+    multi-ecosystem-group: "java"
