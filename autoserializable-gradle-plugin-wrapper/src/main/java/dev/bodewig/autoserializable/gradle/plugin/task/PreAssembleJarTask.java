@@ -12,7 +12,7 @@ import org.gradle.jvm.tasks.Jar;
  * Prematurely creates a jar file from the compiled classes to use during transformation
  */
 @CacheableTask
-public class PreAssembleJarTask extends Jar {
+public abstract class PreAssembleJarTask extends Jar {
 
     /**
      * The default name of the task

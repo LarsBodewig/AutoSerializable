@@ -13,7 +13,7 @@ import java.util.Set;
  * Places the dependencies specified as configuration in a directory
  */
 @CacheableTask
-public class PullJarsTask extends Copy {
+public abstract class PullJarsTask extends Copy {
 
     /**
      * The default name of the task
