@@ -46,10 +46,9 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>dev.gradleplugins</groupId>
+                <groupId>dev.bodewig</groupId>
                 <artifactId>gradle-api</artifactId>
-                <version>8.5</version>
-                <scope>provided</scope>
+                <version>9.6.1.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

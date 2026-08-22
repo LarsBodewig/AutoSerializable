@@ -32,8 +32,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>dev.gradleplugins</groupId>
+            <groupId>dev.bodewig</groupId>
             <artifactId>gradle-api</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>dev.bodewig.autoserializable</groupId>
