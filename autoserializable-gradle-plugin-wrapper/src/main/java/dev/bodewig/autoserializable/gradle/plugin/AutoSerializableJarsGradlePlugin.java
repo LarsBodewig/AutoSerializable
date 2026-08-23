@@ -35,9 +35,19 @@ public class AutoSerializableJarsGradlePlugin implements Plugin<Project> {
     public static final String AUTO_SERIALIZABLE_CONFIGURATION_NAME = "autoSerializable";
 
     /**
+     * The name of the configuration resolver used for jars to transform with byte-buddy
+     */
+    public static final String AUTO_SERIALIZABLE_CONFIGURATION_RESOLVER_NAME = "autoSerializableResolver";
+
+    /**
      * The name of the configuration used for custom serializer compilation
      */
     public static final String NON_PRIVATE_CONFIGURATION_NAME = "nonPrivateConfig";
+
+    /**
+     * The name of the configuration resolver used for custom serializer compilation
+     */
+    public static final String NON_PRIVATE_CONFIGURATION_RESOLVER_NAME = "nonPrivateConfigResolver";
 
     /**
      * The name of the configuration used as classpath for the byte-buddy gradle plugin
@@ -45,14 +55,29 @@ public class AutoSerializableJarsGradlePlugin implements Plugin<Project> {
     public static final String SERIALIZERS_CONFIGURATION_NAME = "autoSerializers";
 
     /**
+     * The name of the configuration resolver used as classpath for the byte-buddy gradle plugin
+     */
+    public static final String SERIALIZERS_CONFIGURATION_RESOLVER_NAME = "autoSerializersResolver";
+
+    /**
      * The name of the configuration used to add api dependencies
      */
     public static final String API_DEPENDENCIES_CONFIGURATION_NAME = "autoserializableDeps";
 
     /**
+     * The name of the configuration resolver used to add api dependencies
+     */
+    public static final String API_DEPENDENCIES_CONFIGURATION_RESOLVER_NAME = "autoserializableDepsResolver";
+
+    /**
      * The name of the configuration used to add test dependencies
      */
     public static final String TEST_CONFIGURATION_NAME = "autoSerializableTest";
+
+    /**
+     * The name of the configuration resolver used to add test dependencies
+     */
+    public static final String TEST_CONFIGURATION_RESOLVER_NAME = "autoSerializableTestResolver";
 
     /**
      * Default constructor
@@ -82,33 +107,46 @@ public class AutoSerializableJarsGradlePlugin implements Plugin<Project> {
 
         // create configuration to register dependencies to transform
         Configuration autoSerializableConfig =
-                project.getConfigurations().maybeCreate(AUTO_SERIALIZABLE_CONFIGURATION_NAME);
+                project.getConfigurations().findByName(AUTO_SERIALIZABLE_CONFIGURATION_NAME) != null ?
+                        project.getConfigurations().findByName(AUTO_SERIALIZABLE_CONFIGURATION_NAME) :
+                        project.getConfigurations().dependencyScope(AUTO_SERIALIZABLE_CONFIGURATION_NAME).get();
+        Configuration autoSerializableResolver =
+                project.getConfigurations().findByName(AUTO_SERIALIZABLE_CONFIGURATION_RESOLVER_NAME) != null ?
+                        project.getConfigurations().findByName(AUTO_SERIALIZABLE_CONFIGURATION_RESOLVER_NAME) :
+                        project.getConfigurations().resolvable(AUTO_SERIALIZABLE_CONFIGURATION_RESOLVER_NAME).get();
+        autoSerializableResolver.extendsFrom(autoSerializableConfig);
 
         // create task to download registered dependencies
         TaskProvider<PullJarsTask> pullJarsTask = project.getTasks()
                 .register(PullJarsTask.TASK_NAME, PullJarsTask.class,
-                        task -> task.setConfiguration(autoSerializableConfig));
+                        task -> task.setConfiguration(autoSerializableResolver));
 
         // create task to make downloaded dependencies non private
         TaskProvider<NonPrivateTask> nonPrivateTask =
                 project.getTasks().register(NonPrivateTask.TASK_NAME, NonPrivateTask.class, task -> {
                     task.setSource(pullJarsTask.flatMap(PullJarsTask::getPulledDir).get().getAsFile());
-                    task.setClassPath(autoSerializableConfig);
+                    task.setClassPath(autoSerializableResolver);
                     task.dependsOn(pullJarsTask);
                 });
 
         // add nonprivate jars to compile configuration
         Configuration nonPrivateConfig =
-                project.getConfigurations().maybeCreate(NON_PRIVATE_CONFIGURATION_NAME);
+                project.getConfigurations().findByName(NON_PRIVATE_CONFIGURATION_NAME) != null ?
+                        project.getConfigurations().findByName(NON_PRIVATE_CONFIGURATION_NAME) :
+                        project.getConfigurations().dependencyScope(NON_PRIVATE_CONFIGURATION_NAME).get();
         nonPrivateConfig.defaultDependencies(dependencies -> {
             Provider<File> nonPrivateOutput = nonPrivateTask.map(NonPrivateTask::getTarget);
             Dependency nonPrivateJars =
                     project.getDependencies().create(project.fileTree(nonPrivateOutput, jarFilter()));
             dependencies.add(nonPrivateJars);
         });
+        Configuration nonPrivateResolver = project.getConfigurations().findByName(NON_PRIVATE_CONFIGURATION_RESOLVER_NAME) != null ?
+                project.getConfigurations().findByName(NON_PRIVATE_CONFIGURATION_RESOLVER_NAME) :
+                project.getConfigurations().resolvable(NON_PRIVATE_CONFIGURATION_RESOLVER_NAME).get();
+        nonPrivateResolver.extendsFrom(nonPrivateConfig);
         Configuration compileClasspathConfig =
                 project.getConfigurations().getByName(JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME);
-        compileClasspathConfig.extendsFrom(nonPrivateConfig);
+        compileClasspathConfig.extendsFrom(nonPrivateResolver);
 
         // run non private task before compiling
         TaskProvider<JavaCompile> compileTask =
@@ -127,7 +165,10 @@ public class AutoSerializableJarsGradlePlugin implements Plugin<Project> {
                 });
 
         // create configuration with compiled classes and non private libs to find serializers
-        Configuration serializersConfig = project.getConfigurations().maybeCreate(SERIALIZERS_CONFIGURATION_NAME);
+        Configuration serializersConfig =
+                project.getConfigurations().findByName(SERIALIZERS_CONFIGURATION_NAME) != null ?
+                        project.getConfigurations().findByName(SERIALIZERS_CONFIGURATION_NAME) :
+                        project.getConfigurations().dependencyScope(SERIALIZERS_CONFIGURATION_NAME).get();
         serializersConfig.defaultDependencies(dependencies -> {
             DirectoryProperty preAssembleJarOutput = preAssembleJarTask.get().getDestinationDirectory();
             Dependency compiledClasses =
@@ -136,14 +177,19 @@ public class AutoSerializableJarsGradlePlugin implements Plugin<Project> {
 
             dependencies.add(AutoSerializableDependencies.autoserializableApi(project));
         });
-        serializersConfig.extendsFrom(compileClasspathConfig);
+        Configuration serializersResolver =
+                project.getConfigurations().findByName(SERIALIZERS_CONFIGURATION_RESOLVER_NAME) != null ?
+                        project.getConfigurations().findByName(SERIALIZERS_CONFIGURATION_RESOLVER_NAME) :
+                        project.getConfigurations().resolvable(SERIALIZERS_CONFIGURATION_RESOLVER_NAME).get();
+        serializersResolver.extendsFrom(serializersConfig);
+        serializersResolver.extendsFrom(compileClasspathConfig);
 
         // create task to make downloaded dependencies serializable
         TaskProvider<AutoSerializableJarsTask> autoSerializableJarsTask = project.getTasks()
                 .register(AutoSerializableJarsTask.TASK_NAME, AutoSerializableJarsTask.class, task -> {
                     Directory pulledDir = pullJarsTask.flatMap(PullJarsTask::getPulledDir).get();
                     task.setSource(pulledDir.getAsFile());
-                    task.setClassPath(serializersConfig);
+                    task.setClassPath(serializersResolver);
                     task.setClassFileVersion(ClassFileVersion.ofJavaVersion(compileTask.flatMap(JavaCompile::getJavaCompiler).map(JavaCompiler::getMetadata).map(JavaInstallationMetadata::getLanguageVersion).get().asInt()));
                     task.dependsOn(preAssembleJarTask);
                     autoSerializableJarsOutput.getJarFiles().addAll(pulledDir.getAsFileTree().getFiles());
@@ -151,7 +197,9 @@ public class AutoSerializableJarsGradlePlugin implements Plugin<Project> {
 
         // add autoserializable jars and the autoserializable-api to api configuration
         Configuration apiConfig =
-                project.getConfigurations().maybeCreate(API_DEPENDENCIES_CONFIGURATION_NAME);
+                project.getConfigurations().findByName(API_DEPENDENCIES_CONFIGURATION_NAME) != null ?
+                        project.getConfigurations().findByName(API_DEPENDENCIES_CONFIGURATION_NAME) :
+                        project.getConfigurations().dependencyScope(API_DEPENDENCIES_CONFIGURATION_NAME).get();
         apiConfig.defaultDependencies(dependencies -> {
             Dependency autoserializableApi = AutoSerializableDependencies.autoserializableApi(project);
             dependencies.add(autoserializableApi);
@@ -161,12 +209,19 @@ public class AutoSerializableJarsGradlePlugin implements Plugin<Project> {
                     project.getDependencies().create(project.fileTree(autoSerializableOutput, jarFilter()));
             dependencies.add(transformedDir);
         });
+        Configuration apiResolver =
+                project.getConfigurations().findByName(API_DEPENDENCIES_CONFIGURATION_RESOLVER_NAME) != null ?
+                        project.getConfigurations().findByName(API_DEPENDENCIES_CONFIGURATION_RESOLVER_NAME) :
+                        project.getConfigurations().resolvable(API_DEPENDENCIES_CONFIGURATION_RESOLVER_NAME).get();
+        apiResolver.extendsFrom(apiConfig);
         project.getConfigurations()
-                .getByName(JavaPlugin.API_CONFIGURATION_NAME, config -> config.extendsFrom(apiConfig));
+                .getByName(JavaPlugin.API_CONFIGURATION_NAME, config -> config.extendsFrom(apiResolver));
 
         // add autoserializable jars and autoserializable-junit to test configuration
         Configuration testConfig =
-                project.getConfigurations().maybeCreate(TEST_CONFIGURATION_NAME);
+                project.getConfigurations().findByName(TEST_CONFIGURATION_NAME) != null ?
+                        project.getConfigurations().findByName(TEST_CONFIGURATION_NAME) :
+                        project.getConfigurations().dependencyScope(TEST_CONFIGURATION_NAME).get();
         testConfig.defaultDependencies(dependencies -> {
             dependencies.add(AutoSerializableDependencies.autoserializableJunit(project));
 
@@ -175,8 +230,13 @@ public class AutoSerializableJarsGradlePlugin implements Plugin<Project> {
                     project.getDependencies().create(project.fileTree(autoSerializableOutput, jarFilter()));
             dependencies.add(transformedDir);
         });
+        Configuration testResolver =
+                project.getConfigurations().findByName(TEST_CONFIGURATION_RESOLVER_NAME) != null ?
+                        project.getConfigurations().findByName(TEST_CONFIGURATION_RESOLVER_NAME) :
+                        project.getConfigurations().resolvable(TEST_CONFIGURATION_RESOLVER_NAME).get();
+        testResolver.extendsFrom(testConfig);
         project.getConfigurations()
-                .getByName(JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME, config -> config.extendsFrom(testConfig));
+                .getByName(JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME, config -> config.extendsFrom(testResolver));
 
         // run autoserializable task before compiling tests
         project.getTasks().named(JavaPlugin.COMPILE_TEST_JAVA_TASK_NAME)
