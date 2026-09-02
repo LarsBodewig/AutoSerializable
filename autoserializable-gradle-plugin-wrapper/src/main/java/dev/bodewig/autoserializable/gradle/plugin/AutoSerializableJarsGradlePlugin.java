@@ -143,6 +143,29 @@ public class AutoSerializableJarsGradlePlugin implements Plugin<Project> {
         Configuration nonPrivateResolver = project.getConfigurations().findByName(NON_PRIVATE_CONFIGURATION_RESOLVER_NAME) != null ?
                 project.getConfigurations().findByName(NON_PRIVATE_CONFIGURATION_RESOLVER_NAME) :
                 project.getConfigurations().resolvable(NON_PRIVATE_CONFIGURATION_RESOLVER_NAME).get();
+        nonPrivateResolver.getResolutionStrategy().eachDependency(details -> {
+            String requestedVersion = details.getRequested().getVersion();
+
+            // Hier fangen wir das "provider(?)" direkt bei der Pfadauflösung ab!
+            if (requestedVersion != null && requestedVersion.contains("provider")) {
+
+                org.gradle.api.artifacts.VersionCatalogsExtension catalogs =
+                        project.getExtensions().findByType(org.gradle.api.artifacts.VersionCatalogsExtension.class);
+
+                if (catalogs != null) {
+                    catalogs.find("libs").ifPresent(catalog -> {
+                        // Wir suchen die Version im Catalog anhand des Modulnamens (z.B. "gdx")
+                        catalog.findVersion(details.getRequested().getName()).ifPresent(versionConstraint -> {
+                            String realVersion = versionConstraint.getRequiredVersion();
+                            if (!realVersion.isEmpty()) {
+                                // Hier überschreiben wir die Zielversion für die Auflösung!
+                                details.useVersion(realVersion);
+                            }
+                        });
+                    });
+                }
+            }
+        });
         nonPrivateResolver.extendsFrom(nonPrivateConfig);
         Configuration compileClasspathConfig =
                 project.getConfigurations().getByName(JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME);
@@ -181,6 +204,29 @@ public class AutoSerializableJarsGradlePlugin implements Plugin<Project> {
                 project.getConfigurations().findByName(SERIALIZERS_CONFIGURATION_RESOLVER_NAME) != null ?
                         project.getConfigurations().findByName(SERIALIZERS_CONFIGURATION_RESOLVER_NAME) :
                         project.getConfigurations().resolvable(SERIALIZERS_CONFIGURATION_RESOLVER_NAME).get();
+        serializersResolver.getResolutionStrategy().eachDependency(details -> {
+            String requestedVersion = details.getRequested().getVersion();
+
+            // Hier fangen wir das "provider(?)" direkt bei der Pfadauflösung ab!
+            if (requestedVersion != null && requestedVersion.contains("provider")) {
+
+                org.gradle.api.artifacts.VersionCatalogsExtension catalogs =
+                        project.getExtensions().findByType(org.gradle.api.artifacts.VersionCatalogsExtension.class);
+
+                if (catalogs != null) {
+                    catalogs.find("libs").ifPresent(catalog -> {
+                        // Wir suchen die Version im Catalog anhand des Modulnamens (z.B. "gdx")
+                        catalog.findVersion(details.getRequested().getName()).ifPresent(versionConstraint -> {
+                            String realVersion = versionConstraint.getRequiredVersion();
+                            if (!realVersion.isEmpty()) {
+                                // Hier überschreiben wir die Zielversion für die Auflösung!
+                                details.useVersion(realVersion);
+                            }
+                        });
+                    });
+                }
+            }
+        });
         serializersResolver.extendsFrom(serializersConfig);
         serializersResolver.extendsFrom(compileClasspathConfig);
 
