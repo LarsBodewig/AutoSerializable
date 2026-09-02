@@ -46,9 +46,9 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>dev.bodewig</groupId>
-                <artifactId>gradle-api</artifactId>
-                <version>9.6.1.1</version>
+                <groupId>org.gradle.experimental</groupId>
+                <artifactId>gradle-public-api</artifactId>
+                <version>9.7.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -211,4 +211,11 @@
             </url>
         </repository>
     </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>gradle</id>
+            <url>https://repo.gradle.org/gradle/libs-releases/</url>
+        </repository>
+    </repositories>
 </project>

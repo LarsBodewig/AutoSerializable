@@ -32,8 +32,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>dev.bodewig</groupId>
-            <artifactId>gradle-api</artifactId>
+            <groupId>org.gradle.experimental</groupId>
+            <artifactId>gradle-public-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
