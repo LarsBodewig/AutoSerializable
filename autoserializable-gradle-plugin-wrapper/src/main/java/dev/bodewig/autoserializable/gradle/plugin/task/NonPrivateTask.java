@@ -1,6 +1,7 @@
 package dev.bodewig.autoserializable.gradle.plugin.task;
 
 import dev.bodewig.autoserializable.NonPrivatePlugin;
+import net.bytebuddy.ClassFileVersion;
 import net.bytebuddy.build.gradle.ByteBuddyJarsTask;
 import org.gradle.api.tasks.CacheableTask;
 import org.gradle.api.tasks.Classpath;
@@ -29,6 +30,7 @@ public class NonPrivateTask extends ByteBuddyJarsTask {
     public NonPrivateTask() {
         setTarget(getProject().getLayout().getBuildDirectory().dir(NON_PRIVATE_DIR_NAME).get().getAsFile());
         transformation(tf -> tf.setPlugin(NonPrivatePlugin.class));
+        setClassFileVersion(ClassFileVersion.ofThisVm());
     }
 
     @Override

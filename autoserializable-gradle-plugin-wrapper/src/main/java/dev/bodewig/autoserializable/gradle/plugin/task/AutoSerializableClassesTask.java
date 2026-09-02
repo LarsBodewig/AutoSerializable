@@ -1,6 +1,7 @@
 package dev.bodewig.autoserializable.gradle.plugin.task;
 
 import dev.bodewig.autoserializable.AutoSerializablePlugin;
+import net.bytebuddy.ClassFileVersion;
 import net.bytebuddy.build.gradle.ByteBuddySimpleTask;
 import org.gradle.api.file.Directory;
 import org.gradle.api.provider.Provider;
@@ -36,6 +37,7 @@ public class AutoSerializableClassesTask extends ByteBuddySimpleTask {
         movedDir = getProject().getLayout().getBuildDirectory().dir(MOVED_CLASSES_DIR_NAME);
         setSource(getProject().getLayout().getBuildDirectory().get().getAsFile());
         transformation(tf -> tf.setPlugin(AutoSerializablePlugin.class));
+        setClassFileVersion(ClassFileVersion.ofThisVm());
     }
 
     @Override
