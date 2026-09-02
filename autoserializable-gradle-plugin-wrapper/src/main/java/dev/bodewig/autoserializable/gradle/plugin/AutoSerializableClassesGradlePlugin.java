@@ -5,6 +5,7 @@ import dev.bodewig.autoserializable.api.gradle.output.JavaClassesOutput;
 import dev.bodewig.autoserializable.gradle.plugin.task.AutoSerializableClassesTask;
 import dev.bodewig.autoserializable.gradle.plugin.task.AutoSerializableJarsTask;
 import dev.bodewig.autoserializable.gradle.plugin.task.PreAssembleJarTask;
+import net.bytebuddy.ClassFileVersion;
 import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -17,6 +18,8 @@ import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.compile.JavaCompile;
+import org.gradle.jvm.toolchain.JavaCompiler;
+import org.gradle.jvm.toolchain.JavaInstallationMetadata;
 
 /**
  * Gradle plugin that invokes the custom byte-buddy plugin AutoSerializable on compiled classes
@@ -97,6 +100,7 @@ public class AutoSerializableClassesGradlePlugin implements Plugin<Project> {
                 .register(AutoSerializableClassesTask.TASK_NAME, AutoSerializableClassesTask.class, task -> {
                     Provider<Directory> compiledDir = compileTask.flatMap(JavaCompile::getDestinationDirectory);
                     task.setInPlace(compiledDir);
+                    task.setClassFileVersion(ClassFileVersion.ofJavaVersion(compileTask.flatMap(JavaCompile::getJavaCompiler).map(JavaCompiler::getMetadata).map(JavaInstallationMetadata::getLanguageVersion).get().asInt()));
                     task.setClassPath(serializersConfig);
                     task.dependsOn(preAssembleJarTask);
                     task.dependsOn(project.getTasks().named(JavaPlugin.PROCESS_RESOURCES_TASK_NAME));

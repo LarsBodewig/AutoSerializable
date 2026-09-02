@@ -6,6 +6,7 @@ import dev.bodewig.autoserializable.gradle.plugin.task.AutoSerializableJarsTask;
 import dev.bodewig.autoserializable.gradle.plugin.task.NonPrivateTask;
 import dev.bodewig.autoserializable.gradle.plugin.task.PreAssembleJarTask;
 import dev.bodewig.autoserializable.gradle.plugin.task.PullJarsTask;
+import net.bytebuddy.ClassFileVersion;
 import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -18,6 +19,8 @@ import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.compile.JavaCompile;
+import org.gradle.jvm.toolchain.JavaCompiler;
+import org.gradle.jvm.toolchain.JavaInstallationMetadata;
 
 import java.io.File;
 
@@ -141,6 +144,7 @@ public class AutoSerializableJarsGradlePlugin implements Plugin<Project> {
                     Directory pulledDir = pullJarsTask.flatMap(PullJarsTask::getPulledDir).get();
                     task.setSource(pulledDir.getAsFile());
                     task.setClassPath(serializersConfig);
+                    task.setClassFileVersion(ClassFileVersion.ofJavaVersion(compileTask.flatMap(JavaCompile::getJavaCompiler).map(JavaCompiler::getMetadata).map(JavaInstallationMetadata::getLanguageVersion).get().asInt()));
                     task.dependsOn(preAssembleJarTask);
                     autoSerializableJarsOutput.getJarFiles().addAll(pulledDir.getAsFileTree().getFiles());
                 });
