@@ -2,6 +2,7 @@
 
 * Replaced outdated gradleplugin API with the experimental Gradle API
 * Updated to JUnit 6
+* Annotations were wrongfully transformed to extend Serializable
 
 # v2.1.1
 

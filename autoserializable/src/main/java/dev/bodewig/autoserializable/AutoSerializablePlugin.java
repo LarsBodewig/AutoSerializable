@@ -126,6 +126,11 @@ public class AutoSerializablePlugin extends NonPrivatePlugin implements Plugin.W
             return builder;
         }
 
+        // annotations should not extend Serializable
+        if (typeDescription.isAnnotation()) {
+            return builder;
+        }
+
         boolean implementsSerializable = typeDescription.isEnum()// typeDescriptions of Enums don't declare implementing
                 // Serializable, but do after compilation leading to exceptions when trying to add it explicitly
                 || typeDescription.getInterfaces().stream().anyMatch(i -> i.represents(Serializable.class));
