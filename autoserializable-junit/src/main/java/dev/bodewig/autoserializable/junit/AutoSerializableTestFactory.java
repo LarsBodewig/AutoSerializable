@@ -7,8 +7,8 @@ import dev.bodewig.autoserializable.api.AutoSerializer;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.function.ThrowingConsumer;
+import org.junit.platform.commons.support.scanning.ClassFilter;
 import org.junit.platform.commons.util.AnnotationUtils;
-import org.junit.platform.commons.util.ClassFilter;
 import org.junit.platform.commons.util.ReflectionUtils;
 
 import java.io.*;

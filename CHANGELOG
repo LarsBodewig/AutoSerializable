@@ -1,3 +1,8 @@
+# v2.2.0
+
+* Replaced outdated gradleplugin API with the experimental Gradle API
+* Updated to JUnit 6
+
 # v2.1.1
 
 * Do not fail on empty source set
