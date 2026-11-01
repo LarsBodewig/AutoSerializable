@@ -44,6 +44,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.gradle.experimental</groupId>
+            <artifactId>gradle-public-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.badlogicgames.gdx</groupId>
             <artifactId>gdx-jnigen-loader</artifactId>
             <version>2.5.1</version>
