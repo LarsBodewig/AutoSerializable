@@ -22,19 +22,25 @@ java {
 }
 
 def testOutput = tasks.register('testOutput') {
-    doFirst(() -> {
+    doLast(() -> {
         JavaClassesOutput javaClassesOutput = project.getExtensions().getByType(JavaClassesOutput.class)
         Set<String> one = javaClassesOutput.getClassFiles()
-        System.out.println("\nJavaClassesOutput: " + one)
-        assert !one.isEmpty(): "JavaClassesOutput was empty"
+        logger.info("JavaClassesOutput: " + one)
+        if (one.isEmpty()) {
+            throw new GradleException("JavaClassesOutput was empty")
+        }
         AutoSerializableJarsOutput autoSerializableJarsOutput = project.getExtensions().getByType(AutoSerializableJarsOutput.class)
         Set<String> two = autoSerializableJarsOutput.getJarFiles()
-        System.out.println("\nAutoSerializableJarsOutput: " + two)
-        assert !two.isEmpty(): "AutoSerializableJarsOutput was empty"
+        logger.info("AutoSerializableJarsOutput: " + two)
+        if (two.isEmpty()) {
+            throw new GradleException("AutoSerializableJarsOutput was empty")
+        }
         AutoSerializableClassesOutput autoSerializableClassesOutput = project.getExtensions().getByType(AutoSerializableClassesOutput.class)
         Set<String> three = autoSerializableClassesOutput.getClassFiles()
-        System.out.println("\nAutoSerializableClassesOutput: " + three)
-        assert !three.isEmpty(): "AutoSerializableClassesOutput was empty"
+        logger.info("AutoSerializableClassesOutput: " + three)
+        if (three.isEmpty()) {
+            throw new GradleException("AutoSerializableClassesOutput was empty")
+        }
     })
 }
 
