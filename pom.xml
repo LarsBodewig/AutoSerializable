@@ -16,6 +16,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <bytebuddy.version>1.15.11</bytebuddy.version>
+        <!-- gradle does not accept empty arguments or single dash but this works -->
+        <gradleArgs>--</gradleArgs>
     </properties>
 
     <modules>
@@ -49,7 +51,7 @@
             <dependency>
                 <groupId>org.gradle.experimental</groupId>
                 <artifactId>gradle-public-api</artifactId>
-                <version>9.7.0</version>
+                <version>9.8.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -100,11 +102,6 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-deploy-plugin</artifactId>
-                    <version>3.1.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.3.0</version>
                 </plugin>
@@ -115,11 +112,31 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.12.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <deploymentName>autoserializable</deploymentName>
+                    <excludeArtifacts>
+                        <excludeArtifact>autoserializable-gradle-plugin-wrapper</excludeArtifact>
+                        <excludeArtifact>autoserializable-test</excludeArtifact>
+                    </excludeArtifacts>
+                    <forcedStagingDirectory>${maven.multiModuleProjectDirectory}/target/central-staging
+                    </forcedStagingDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
     <profiles>
         <profile>
-            <id>javadoc</id>
+            <id>release-test</id>
+            <properties>
+                <gradleArgs>-Ptest</gradleArgs>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -133,6 +150,15 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <configuration>
+                            <skipUpload>true</skipUpload>
+                            <forcedDeferredDirectory>${maven.multiModuleProjectDirectory}/target/central-staging
+                            </forcedDeferredDirectory>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
@@ -140,6 +166,24 @@
             <id>release</id>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <version>3.6.3</version>
+                        <executions>
+                            <execution>
+                                <id>enforce-no-snapshots</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireReleaseVersion/>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
@@ -175,6 +219,15 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <configuration>
+                            <skipUpload>false</skipUpload>
+                            <autoPublish>true</autoPublish>
+                            <waitUntil>published</waitUntil>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
@@ -200,18 +253,8 @@
         <developerConnection>
             scm:git:ssh://github.com:LarsBodewig/AutoSerializable.git
         </developerConnection>
-        <url>http://github.com/LarsBodewig/AutoSerializable</url>
+        <url>https://github.com/LarsBodewig/AutoSerializable</url>
     </scm>
-
-    <distributionManagement>
-        <repository>
-            <id>central-api</id>
-            <!-- https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/#configuring-the-repository -->
-            <url>
-                https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/
-            </url>
-        </repository>
-    </distributionManagement>
 
     <repositories>
         <repository>

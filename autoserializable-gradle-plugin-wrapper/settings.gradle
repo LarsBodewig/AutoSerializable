@@ -1,6 +1,6 @@
 //file:noinspection GrUnresolvedAccess
 pluginManagement {
-    rootProject.name = "$artifactId"
+    rootProject.name = "autoserializable-gradle-plugin"
 
     repositories {
         mavenLocal()
