@@ -1,0 +1,63 @@
+# Builds the project with Maven Wrapper using the 'release' profile and publishes to Maven Central
+# ---
+# Add the following GitHub secrets from your Secret Manager
+# - CENTRAL_TOKEN_USERNAME: your Sonatype username
+# - CENTRAL_TOKEN_PASSWORD: an Access Token generated in your Sonatype profile
+# - MAVEN_GPG_PASSPHRASE:   your GPG passphrase
+# - MAVEN_GPG_PRIVATE_KEY:  your GPG private key
+# - PERSONAL_GITHUB_TOKEN:  personal GitHub token
+
+name: Publish
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-slim
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+      - name: Set up JDK
+        uses: actions/setup-java@v6.1.0
+        with:
+          distribution: temurin
+          java-version: latest
+          server-id: central
+          server-username-env-var: CENTRAL_TOKEN_USERNAME
+          server-password-env-var: CENTRAL_TOKEN_PASSWORD
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+          gpg-passphrase-env-var: MAVEN_GPG_PASSPHRASE
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6.4.1
+      - name: Setup GPG
+        # for some reason it is not enough to supply the key via env var
+        run: echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
+      - name: Remove snapshot version
+        id: remove_snapshot
+        uses: ./.github/actions/version
+      - name: Publish to Apache Maven Central
+        env:
+          CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
+          CENTRAL_TOKEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          ./mvnw clean deploy -B -e -P release
+      - name: Set tag
+        run: |
+          git tag -a -f -m "v${{ steps.remove_snapshot.outputs.newVersion }}" \
+            "v${{ steps.remove_snapshot.outputs.newVersion }}"
+      - name: Set next snapshot version
+        id: next_snapshot
+        uses: ./.github/actions/version
+      - name: Push commits and tag
+        run: |
+          git push origin "v${{ steps.remove_snapshot.outputs.newVersion }}" -f
+          git push origin HEAD -f
