@@ -1,0 +1,24 @@
+name: Diff
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  diff:
+    runs-on: ubuntu-slim
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Set up JDK
+        uses: actions/setup-java@v6.1.0
+        with:
+          distribution: temurin
+          java-version: latest
+      - name: Build and run tests
+        # verify does not suffice as gradle searches the local maven repo
+        run: ./mvnw clean install -B

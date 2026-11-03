@@ -1,11 +1,12 @@
 //file:noinspection GrUnresolvedAccess
 buildscript {
-    group = "$groupId"
+    group = "dev.bodewig.autoserializable"
 }
 
 plugins {
     id 'java-gradle-plugin'
     id 'maven-publish'
+    id 'signing'
 }
 
 repositories {
@@ -52,16 +53,43 @@ gradlePlugin {
     }
 }
 
-publishing.publications.withType(MavenPublication) { pub ->
-    pom.withXml {
-        def pom = asNode()
-        def parent = pom.appendNode('parent')
-        parent.appendNode('groupId', "$group")
-        parent.appendNode('artifactId', 'autoserializable-parent')
-        parent.appendNode('version', "$version")
-        pom.appendNode('name', 'AutoSerializable gradle plugin')
-        pom.appendNode('description', 'Adds a configuration to make dependencies serializable')
+publishing {
+    publications.withType(MavenPublication) { pub ->
+        pom.withXml {
+            def pom = asNode()
+            def parent = pom.appendNode('parent')
+            parent.appendNode('groupId', "$group")
+            parent.appendNode('artifactId', 'autoserializable-parent')
+            parent.appendNode('version', "$version")
+            pom.appendNode('name', 'AutoSerializable gradle plugin')
+            pom.appendNode('description', 'Adds a configuration to make dependencies serializable')
+        }
     }
+    repositories {
+        maven {
+            name = "CentralStaging"
+            url = uri(layout.buildDirectory.dir("temp-repo"))
+        }
+    }
+}
+
+signing {
+    useInMemoryPgpKeys(
+            project.hasProperty('test') ? file('test-private.key').text : System.getenv('GPG_PRIVATE_KEY'),
+            project.hasProperty('test') ? '' : System.getenv('GPG_PASSPHRASE')
+    )
+    sign publishing.publications
+}
+
+tasks.register("publishToCentralStaging", Copy) {
+    dependsOn tasks.named("publishAllPublicationsToCentralStagingRepository")
+    from layout.buildDirectory.dir("temp-repo")
+    into layout.projectDirectory.dir("../target/central-staging")
+    exclude "**/maven-metadata*.xml"
+    exclude "**/maven-metadata*.xml.md5"
+    exclude "**/maven-metadata*.xml.sha1"
+    exclude "**/maven-metadata*.xml.sha256"
+    exclude "**/maven-metadata*.xml.sha512"
 }
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'

@@ -47,7 +47,3 @@ execution to find custom serializers.
 If you want to writer a custom serializer for a non-accessible library class or including a non-accessible library class
 field, just place the serializer in a package with the same name as the library class.
 All library classes and fields are made visible to their respective package during plugin execution automatically.
-
----
-
-Run `git config --add include.path ../.gitconfig` to include the template config in your project config.

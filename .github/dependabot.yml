@@ -6,9 +6,11 @@ multi-ecosystem-groups:
   java:
     schedule:
       interval: "monthly"
-    cooldown:
-      default-days: 7
-      semver-major-days: 21
+
+registries:
+  maven-gradle:
+    type: maven-repository
+    url: https://repo.gradle.org/gradle/libs-releases/
 
 updates:
   - package-ecosystem: "github-actions"
@@ -23,13 +25,30 @@ updates:
           - "*"
 
   - package-ecosystem: "maven"
+    registries:
+      - maven-gradle
     directory: "/"
+    patterns:
+      - "*"
     multi-ecosystem-group: "java"
+    cooldown:
+      default-days: 7
+      semver-major-days: 21
 
   - package-ecosystem: "gradle"
     directory: "/autoserializable-gradle-plugin-wrapper"
+    patterns:
+      - "*"
     multi-ecosystem-group: "java"
+    cooldown:
+      default-days: 7
+      semver-major-days: 21
 
   - package-ecosystem: "gradle"
     directory: "/autoserializable-test"
+    patterns:
+      - "*"
     multi-ecosystem-group: "java"
+    cooldown:
+      default-days: 7
+      semver-major-days: 21
