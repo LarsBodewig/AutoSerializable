@@ -75,8 +75,8 @@ publishing {
 
 signing {
     useInMemoryPgpKeys(
-            project.hasProperty('test') ? file('test-private.key').text : System.getenv('GPG_PRIVATE_KEY'),
-            project.hasProperty('test') ? '' : System.getenv('GPG_PASSPHRASE')
+            project.hasProperty('testSign') ? file('test-private.key').text : System.getenv('GPG_PRIVATE_KEY'),
+            project.hasProperty('testSign') ? '' : System.getenv('GPG_PASSPHRASE')
     )
     sign publishing.publications
 }
