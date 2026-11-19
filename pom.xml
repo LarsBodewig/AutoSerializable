@@ -16,8 +16,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <bytebuddy.version>1.18.17</bytebuddy.version>
-        <!-- gradle does not accept empty arguments or single dash but this works -->
-        <gradleArgs>--</gradleArgs>
+        <gradleArgs>-PtestSign</gradleArgs>
     </properties>
 
     <modules>
@@ -164,6 +163,10 @@
         </profile>
         <profile>
             <id>release</id>
+            <properties>
+                <!-- gradle does not accept empty arguments or single dash but this works -->
+                <gradleArgs>--</gradleArgs>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
