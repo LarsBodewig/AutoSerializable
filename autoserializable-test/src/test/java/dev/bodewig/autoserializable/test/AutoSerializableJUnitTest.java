@@ -15,13 +15,22 @@ class AutoSerializableJUnitTest {
     @TestFactory
     Stream<DynamicTest> testAll() {
         List<URI> sources;
-        try (ScanResult scanResult = new ClassGraph().ignoreClassVisibility().filterClasspathElements(
-                path -> path.endsWith("/autoserializable-test/target/classes") ||
-                        path.endsWith("/build/classes/java/main") || path.contains("/build/autoSerializableJars")).scan()) {
+        try (ScanResult scanResult = new ClassGraph()
+                .enableClasspath()
+                .enableClassInfo()
+                .ignoreClassVisibility()
+                .filterClasspathElements(path -> path.endsWith("/autoserializable-test/target/classes") ||
+                        path.endsWith("/build/classes/java/main") || path.contains("/build/autoSerializableJars"))
+                .scan()) {
             sources = scanResult.getClasspathURIs();
         }
-        return new AutoSerializableTestFactory(sources).testAllClassesImplementSerializable().testSerializersAnnotated()
-                .testSerializersExtend().testSerializersUsed().testAutoSerializablesInitialized()
-                .testAnnotatedAutoSerialized().build();
+        return new AutoSerializableTestFactory(sources)
+                .testAllClassesImplementSerializable()
+                .testSerializersAnnotated()
+                .testSerializersExtend()
+                .testSerializersUsed()
+                .testAutoSerializablesInitialized()
+                .testAnnotatedAutoSerialized()
+                .build();
     }
 }

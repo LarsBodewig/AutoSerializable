@@ -27,6 +27,9 @@ import net.bytebuddy.implementation.bytecode.member.MethodReturn;
 import net.bytebuddy.jar.asm.Opcodes;
 
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
@@ -80,17 +83,39 @@ public class AutoSerializablePlugin extends NonPrivatePlugin implements Plugin.W
     public void initialize(File[] classpathElements) {
         if (!classpathSearched) {
             classpathSearched = true;
+            URL[] classpathUrls = Arrays.stream(classpathElements).map(file -> {
+                try {
+                    return file.toURI().toURL();
+                } catch (MalformedURLException e) {
+                    throw new RuntimeException(e);
+                }
+            }).toArray(URL[]::new);
             String classpath = Arrays.stream(classpathElements).map(File::toPath).map(Path::toString)
                     .collect(Collectors.joining(File.pathSeparator));
             logger.info("Scanning classpath for custom serializers");
             logger.fine("Classpath elements: " + Arrays.toString(classpathElements));
-            try (ScanResult result = new ClassGraph().overrideClasspath(classpath).enableAnnotationInfo().scan()) {
-                @SuppressWarnings("unchecked") // unavoidable
+            try (ScanResult result = new ClassGraph()
+                    .enableClasspathEntries(classpath)
+                    .enableClassInfo()
+                    .enableAnnotationInfo()
+                    .scan();
+                 URLClassLoader loader = new URLClassLoader(classpathUrls, getClass().getClassLoader())) {
                 List<TypeDescription> types =
                         result.getClassesWithAnyAnnotation(AutoSerializableAll.class, AutoSerializable.class)
-                                .loadClasses().stream().map(TypeDescription.ForLoadedType::of).toList();
+                                .stream()
+                                .map(classInfo -> {
+                                    try {
+                                        return Class.forName(classInfo.getName(), false, loader);
+                                    } catch (ClassNotFoundException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                })
+                                .map(TypeDescription.ForLoadedType::of)
+                                .toList();
                 logger.info("Found " + types.size() + " custom serializers on classpath");
                 types.forEach(AutoSerializablePlugin::addSerializer);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
     }
