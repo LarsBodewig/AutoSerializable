@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   publish:
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest # slim has a timeout of 15 min, too short
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
