@@ -26,7 +26,7 @@ public final class AutoSerializableDependencies {
     /**
      * The version of the project
      */
-    public static final String VERSION = "2.2.1-SNAPSHOT";
+    public static final String VERSION = "2.2.1";
 
     private AutoSerializableDependencies() {
     }
