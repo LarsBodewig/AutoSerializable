@@ -1,3 +1,8 @@
+> [!WARNING]
+> This project is no longer maintained. Its sole purpose was to support the development of another project,
+> which has now been discontinued.<br>
+> Feel free to fork if you need it for your own purpose. The published versions remain available on Maven Central.
+
 [![ByteBuddy Plugin on Maven Central](https://img.shields.io/maven-central/v/dev.bodewig.autoserializable/autoserializable?label=ByteBuddy%20Plugin%20on%20Maven%20Central)](https://central.sonatype.com/namespace/dev.bodewig.autoserializable)
 [![Gradle Jars Plugin on Maven Central](https://img.shields.io/maven-central/v/dev.bodewig.autoserializable.jars/dev.bodewig.autoserializable.jars.gradle.plugin?label=Gradle%20Jars%20Plugin%20on%20Maven%20Central)](https://central.sonatype.com/namespace/dev.bodewig.autoserializable.jars)
 [![Gradle Classes Plugin on Maven Central](https://img.shields.io/maven-central/v/dev.bodewig.autoserializable.classes/dev.bodewig.autoserializable.classes.gradle.plugin?label=Gradle%20Classes%20Plugin%20on%20Maven%20Central)](https://central.sonatype.com/namespace/dev.bodewig.autoserializable.classes)
